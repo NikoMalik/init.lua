@@ -32,15 +32,10 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 
 vim.keymap.set('n', '\\', '<cmd>:vsplit <CR>', { desc = 'Vertical Split' })
 vim.keymap.set('n', '|', ':split<CR>', { desc = 'Horizontal Split' })
-vim.api.nvim_create_autocmd({ 'InsertEnter' }, {
-  callback = function()
-    vim.o.relativenumber = false
-    vim.o.number = true
-  end,
-})
-vim.api.nvim_create_autocmd({ 'InsertLeave' }, {
-  callback = function()
-    vim.o.relativenumber = true
+
+vim.api.nvim_create_autocmd({ 'InsertEnter', 'InsertLeave' }, {
+  callback = function(event)
+    vim.o.relativenumber = event.event == 'InsertLeave'
     vim.o.number = true
   end,
 })
@@ -60,9 +55,11 @@ vim.o.relativenumber = true
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
 vim.o.wrap = true
+vim.o.showbreak = '↪ '
 
 -- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
+vim.o.list = false
 
 vim.schedule(function()
   vim.o.clipboard = 'unnamedplus'
@@ -155,7 +152,6 @@ rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
-
   {
     'lewis6991/gitsigns.nvim',
     ft = { 'gitcommit', 'diff' },
@@ -253,7 +249,10 @@ require('lazy').setup({
       },
     },
   },
-
+  {
+    'nvim-telescope/telescope-file-browser.nvim',
+    dependencies = { 'nvim-telescope/telescope.nvim', 'nvim-lua/plenary.nvim' },
+  },
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
@@ -289,6 +288,7 @@ require('lazy').setup({
       -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
+      pcall(require('telescope').load_extension, 'file_browser')
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
@@ -307,6 +307,12 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>/', builtin.live_grep, { desc = 'Search all files' })
       vim.keymap.set('n', '<leader>f', builtin.find_files, { desc = 'Search files' })
       vim.keymap.set('n', '<leader>d', builtin.diagnostics, { desc = 'Show diagnostics' })
+      vim.keymap.set('n', '<leader>e', function()
+        require('telescope').extensions.file_browser.file_browser {
+          path = vim.fn.expand '%:p:h',
+          cwd = vim.fn.expand '%:p:h',
+        }
+      end, { desc = 'Open File Browser' })
 
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
@@ -493,6 +499,98 @@ require('lazy').setup({
       local lspconfig = require 'lspconfig'
       local lspconfigs = require 'lspconfig.configs'
 
+      local function get_zls_config()
+        local project_root = vim.fn.getcwd()
+        local zls_json_path = vim.fn.expand '~/.config/zls.json'
+        if string.find(project_root, 'tigerbeetle') then
+          local zig_path = project_root .. '/zig/zig-linux-x86_64-0.13.0/zig'
+          if vim.fn.executable(zig_path) == 0 then
+            vim.notify('Zig 0.13.0 not found at ' .. zig_path, vim.log.levels.ERROR)
+            return {}
+          end
+          local zls_config = {
+            zig_exe_path = zig_path,
+            enable_build_on_save = true,
+            semantic_tokens = 'partial',
+          }
+          local json_content = vim.fn.json_encode(zls_config)
+          vim.fn.mkdir(vim.fn.fnamemodify(zls_json_path, ':h'), 'p')
+          local success, err = pcall(vim.fn.writefile, { json_content }, zls_json_path)
+          if not success then
+            vim.notify('Failed to write zls.json: ' .. err, vim.log.levels.ERROR)
+            return {}
+          end
+          vim.notify('Updated zls.json for TigerBeetle', vim.log.levels.INFO)
+          return {
+            cmd = { '/home/niko/.local/zls-0.13.0/bin/zls' },
+            settings = zls_config,
+            on_init = function()
+              vim.notify('ZLS initialized for TigerBeetle with zig_exe_path=' .. zig_path, vim.log.levels.INFO)
+            end,
+          }
+        else
+          local zig_path = '/usr/bin/zig'
+          if vim.fn.executable(zig_path) == 0 then
+            vim.notify('Zig not found at ' .. zig_path, vim.log.levels.ERROR)
+            return {}
+          end
+          local zls_config = {
+            zig_exe_path = zig_path,
+            enable_build_on_save = true,
+            semantic_tokens = 'partial',
+          }
+          local json_content = vim.fn.json_encode(zls_config)
+          vim.fn.mkdir(vim.fn.fnamemodify(zls_json_path, ':h'), 'p')
+          local success, err = pcall(vim.fn.writefile, { json_content }, zls_json_path)
+          if not success then
+            vim.notify('Failed to write zls.json: ' .. err, vim.log.levels.ERROR)
+            return {}
+          end
+          vim.notify('Updated zls.json for default Zig', vim.log.levels.INFO)
+          return {
+            cmd = { '/home/niko/.local/bin/zls' },
+            settings = zls_config,
+            on_init = function()
+              vim.notify('ZLS initialized with zig_exe_path=' .. zig_path, vim.log.levels.INFO)
+            end,
+          }
+        end
+      end
+
+      vim.api.nvim_create_autocmd('DirChanged', {
+        group = vim.api.nvim_create_augroup('TigerBeetleLSP', { clear = true }),
+        callback = function()
+          local clients = vim.lsp.get_active_clients { name = 'zls' }
+          for _, client in ipairs(clients) do
+            vim.lsp.stop_client(client.id)
+          end
+          vim.defer_fn(function()
+            local config = get_zls_config()
+            if next(config) ~= nil then
+              require('lspconfig').zls.setup(vim.tbl_deep_extend('force', {
+                capabilities = require('blink.cmp').get_lsp_capabilities(),
+                on_attach = function(client, bufnr)
+                  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+                  local bufopts = { buffer = bufnr, noremap = true, silent = true }
+                  vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+                  vim.keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+                end,
+              }, config))
+            end
+          end, 100)
+        end,
+      })
+
+      lspconfig.zls.setup(vim.tbl_deep_extend('force', {
+        capabilities = capabilities,
+        on_attach = function(_, bufnr)
+          vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+          local bufopts = { noremap = true, silent = true, buffer = bufnr }
+          vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
+          vim.keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, bufopts)
+        end,
+      }, get_zls_config()))
+
       local servers = {
         clangd = {
           cmd = { 'clangd' },
@@ -525,16 +623,16 @@ require('lazy').setup({
           },
         },
 
-        zls = {
-          filetypes = { 'zig', 'zon', 'zir' },
-          cmd = { '/home/niko/.local/bin/zls' },
-          settings = {
-            enable_build_on_save = true,
-            semantic_tokens = 'partial',
-
-            zig_exe_path = '/home/niko/.local/bin/zls',
-          },
-        },
+        -- zls = {
+        --   filetypes = { 'zig', 'zon', 'zir' },
+        --   cmd = { '/home/niko/.local/bin/zls' },
+        --   settings = {
+        --     enable_build_on_save = true,
+        --     semantic_tokens = 'partial',
+        --
+        --     zig_exe_path = '/usr/bin/zig-bin-0.14.1',
+        --   },
+        -- },
         -- pyright = {},
         rust_analyzer = {
           cmd = { 'rust-analyzer' },
@@ -694,8 +792,23 @@ require('lazy').setup({
     'rose-pine/neovim',
     priority = 1000,
     name = 'rose-pine',
+  },
+  {
+    'folke/tokyonight.nvim',
+    lazy = false,
+
+    priority = 1000,
+
     config = function()
-      vim.cmd 'colorscheme rose-pine-moon'
+      -- require('tokyonight').setup {
+      --   style = 'night',
+      --   transparent = true,
+      --   styles = {
+      --     sidebars = 'transparent',
+      --     floats = 'transparent',
+      --   },
+      -- }
+      vim.cmd.colorscheme 'tokyonight-night'
     end,
   },
   -- {
@@ -720,7 +833,7 @@ require('lazy').setup({
   --     }
   --
   --     -- Load the colorscheme
-  --     vim.cmd.colorscheme 'rose-pine'
+  --     -- vim.cmd.colorscheme 'rose-pine'
   --
   --     -- Set background to pure black for general UI
   --     vim.cmd [[highlight Normal guibg=#000000]]
