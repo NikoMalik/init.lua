@@ -32,7 +32,9 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 
 vim.keymap.set('n', '\\', '<cmd>:vsplit <CR>', { desc = 'Vertical Split' })
 vim.keymap.set('n', '|', ':split<CR>', { desc = 'Horizontal Split' })
-
+-- vim.cmd.colorscheme 'habamax' -- super great but a litle bit smoke
+-- vim.cmd.colorscheme 'desert' -- or slate
+vim.cmd.colorscheme 'pale-fire'
 vim.api.nvim_create_autocmd({ 'InsertEnter', 'InsertLeave' }, {
   callback = function(event)
     vim.o.relativenumber = event.event == 'InsertLeave'
@@ -40,6 +42,11 @@ vim.api.nvim_create_autocmd({ 'InsertEnter', 'InsertLeave' }, {
   end,
 })
 
+vim.keymap.set('n', '<leader>[', function()
+  vim.diagnostic.open_float(nil, { focusable = false })
+end, { desc = 'LSP diagnostics float' })
+
+-- vim.o.number = true
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
 
@@ -56,6 +63,7 @@ vim.o.relativenumber = true
 vim.o.mouse = 'a'
 vim.o.wrap = true
 vim.o.showbreak = '↪ '
+vim.o.termguicolors = true
 
 -- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
@@ -105,12 +113,12 @@ vim.o.inccommand = 'split'
 vim.o.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.o.scrolloff = 2
+vim.o.scrolloff = 10
 vim.o.tabstop = 4
 vim.o.ttyfast = true
 vim.o.softtabstop = 4
 vim.o.shiftwidth = 4
-vim.o.lazyredraw = true
+-- vim.o.lazyredraw = true
 vim.o.expandtab = false
 vim.o.autoindent = true
 vim.o.smartindent = true
@@ -785,32 +793,68 @@ require('lazy').setup({
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
+  -- {
+  --   'phha/zenburn.nvim',
+  --   config = function()
+  --     require('zenburn').setup()
+  --   end,
+  -- },
 
-  {
-
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'rose-pine/neovim',
-    priority = 1000,
-    name = 'rose-pine',
-  },
-  {
-    'folke/tokyonight.nvim',
-    lazy = false,
-
-    priority = 1000,
-
-    config = function()
-      -- require('tokyonight').setup {
-      --   style = 'night',
-      --   transparent = true,
-      --   styles = {
-      --     sidebars = 'transparent',
-      --     floats = 'transparent',
-      --   },
-      -- }
-      vim.cmd.colorscheme 'tokyonight-night'
-    end,
-  },
+  -- {
+  --
+  --   -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
+  --   'rose-pine/neovim',
+  --   priority = 1000,
+  --   name = 'rose-pine',
+  -- },
+  -- {
+  --   'folke/tokyonight.nvim',
+  --   lazy = false,
+  --
+  --   priority = 1000,
+  --
+  --   config = function()
+  --     -- require('tokyonight').setup {
+  --     --   style = 'night',
+  --     --   transparent = true,
+  --     --   styles = {
+  --     --     sidebars = 'transparent',
+  --     --     floats = 'transparent',
+  --     --   },
+  --     -- }
+  --     -- vim.cmd.colorscheme 'tokyonight-night'
+  --   end,
+  -- },
+  -- {
+  --   'sainnhe/gruvbox-material',
+  --   priority = 1000, -- Ensure Gruvbox Material loads first (if necessary)
+  --   config = function()
+  --     -- Gruvbox Material settings
+  --     vim.o.background = 'dark' -- Set background to dark. Can be "dark" or "light".
+  --     vim.g.gruvbox_material_background = 'soft' -- Options: "soft", "medium", "hard"
+  --     vim.g.gruvbox_material_palette = 'mix' -- Options: "material", "mix", "original"
+  --     vim.g.gruvbox_material_enable_italic = false -- Enable italic comments, etc.
+  --     vim.g.gruvbox_material_better_performance = 1 -- Optimize performance for large files
+  --
+  --     vim.g.gruvbox_material_transparent_background = 2
+  --
+  --     -- Load Gruvbox Material as the colorscheme
+  --     vim.cmd 'colorscheme gruvbox-material'
+  --   end,
+  -- },
+  -- {
+  --   'rebelot/kanagawa.nvim',
+  --   priority = 1000,
+  --   init = function()
+  --     vim.cmd.colorscheme 'kanagawa-dragon'
+  --     -- vim.cmd.hi 'Comment gui=none'
+  --     -- vim.cmd [[highlight! link CmpPmenu KanagawaPmenu]]
+  --     -- vim.cmd [[highlight! link CmpPmenuSel KanagawaPmenuSel]]
+  --     -- vim.cmd [[highlight! link CmpPmenuThumb KanagawaPmenuThumb]]
+  --     -- vim.cmd [[highlight! link CmpDocumentation KanagawaDocumentation]]
+  --     -- vim.cmd [[highlight! link CmpDocumentationBorder KanagawaDocumentationBorder]]
+  --   end,
+  -- },
   -- {
   --   'rose-pine/neovim',
   --   priority = 1000,
