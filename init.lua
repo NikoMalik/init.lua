@@ -34,7 +34,7 @@ vim.keymap.set('n', '\\', '<cmd>:vsplit <CR>', { desc = 'Vertical Split' })
 vim.keymap.set('n', '|', ':split<CR>', { desc = 'Horizontal Split' })
 -- vim.cmd.colorscheme 'habamax' -- super great but a litle bit smoke
 -- vim.cmd.colorscheme 'desert' -- or slate
-vim.cmd.colorscheme 'pale-fire'
+vim.cmd.colorscheme 'dangion'
 vim.api.nvim_create_autocmd({ 'InsertEnter', 'InsertLeave' }, {
   callback = function(event)
     vim.o.relativenumber = event.event == 'InsertLeave'
@@ -159,6 +159,48 @@ rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
+  performance = {
+    -- cache = {
+    --   enabled = true,
+    -- },
+    rtp = {
+      disabled_plugins = {
+        '2html_plugin',
+        'tohtml',
+        'getscript',
+        'getscriptPlugin',
+        'gzip',
+        'logipat',
+        -- 'netrw',
+        -- 'netrwPlugin',
+        -- 'netrwSettings',
+        -- 'netrwFileHandlers',
+        'matchit',
+        'tar',
+        'tarPlugin',
+        'rrhelper',
+        'spellfile_plugin',
+        'vimball',
+        'vimballPlugin',
+        'zip',
+        'zipPlugin',
+        'tutor',
+        'rplugin',
+        'syntax',
+        'synmenu',
+        'optwin',
+        'compiler',
+        'bugreport',
+        'ftplugin',
+        'netrwPlugin',
+        'gzip',
+        'tarPlugin',
+        'tohtml',
+        'tutor',
+        'zipPlugin',
+      },
+    },
+  },
   'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
   {
     'lewis6991/gitsigns.nvim',
@@ -725,7 +767,7 @@ require('lazy').setup({
 
         ['clang-format'] = {
           prepend_args = {
-            '-style={IndentWidth: 4, TabWidth: 4,  PackConstructorInitializers: Never, SortIncludes: false,ColumnLimit: 0}',
+            '-style={IndentWidth: 4, TabWidth: 4,  PackConstructorInitializers: Never, SortIncludes: false,ColumnLimit: 0  }',
           },
         },
         goimports = {
