@@ -67,6 +67,8 @@ vim.o.termguicolors = true
 
 -- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
+
+vim.opt.swapfile = false
 vim.o.list = false
 
 vim.schedule(function()
@@ -673,6 +675,8 @@ require('lazy').setup({
           },
         },
 
+        asm_lsp = {},
+
         -- zls = {
         --   filetypes = { 'zig', 'zon', 'zir' },
         --   cmd = { '/home/niko/.local/bin/zls' },
@@ -693,8 +697,12 @@ require('lazy').setup({
             },
           },
         },
-        docker_compose_language_service = {},
-        dockerls = {},
+
+        dockerls = {
+          cmd = { 'docker-language-server', 'start', '--verbose', '--debug', '--stdio' },
+          filetypes = { 'yaml.docker-compose', 'dockerfile' },
+          root_markers = { 'Dockerfile', 'docker-compose.yaml', 'docker-compose.yml', 'compose.yaml', 'compose.yml', '.git' },
+        },
 
         buf_ls = {
           cmd = { 'buf-language-server' },
