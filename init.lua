@@ -675,7 +675,12 @@ require('lazy').setup({
           },
         },
 
-        asm_lsp = {},
+        -- asm_lsp = { //idk doesnt work correctly with go asm
+
+        --   cmd = { 'asm-lsp' },
+        --   filetypes = { 'asm', 's', 'S' },
+        --   capabilities = capabilities,
+        -- },
 
         -- zls = {
         --   filetypes = { 'zig', 'zon', 'zir' },
