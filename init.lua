@@ -766,6 +766,7 @@ require('lazy').setup({
         jsonc = { 'biome' },
         rust = { 'rustfmt' },
         yaml = { 'yamlfmt' },
+        asm = { 'asmfmt' }, -- go asm
         proto = { 'buf format' },
         c = { 'clang-format' },
         cpp = { 'clang-format' },
