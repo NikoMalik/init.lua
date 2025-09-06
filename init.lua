@@ -645,10 +645,13 @@ require('lazy').setup({
 
       local servers = {
         clangd = {
-          cmd = { 'clangd' },
-          -- init_options = {
-          --   fallbackFlags = { "-DUNIT_TESTING" },
-          -- },
+          cmd = {
+            'clangd',
+            '--clang-tidy',
+            '-j=5',
+            '--malloc-trim',
+          },
+          filetypes = { 'c', 'cpp' },
         },
         gopls = {
           cmd = { 'gopls' },
