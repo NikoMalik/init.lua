@@ -204,6 +204,73 @@ require('lazy').setup({
     },
   },
   'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
+
+  {
+    'OXY2DEV/markview.nvim',
+    lazy = false,
+
+    -- For blink.cmp's completion
+    -- source
+    dependencies = {
+      'saghen/blink.cmp',
+    },
+  },
+  {
+    'nvim-neo-tree/neo-tree.nvim',
+    version = 'v3.x',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-tree/nvim-web-devicons',
+      'MunifTanjim/nui.nvim',
+      's1n7ax/nvim-window-picker',
+    },
+    cmd = 'Neotree',
+    keys = {
+      { '<leader>e', '<cmd>Neotree toggle<CR>', desc = 'Toggle Neo-tree' },
+    },
+    opts = {
+      sources = { 'filesystem', 'buffers', 'git_status' },
+      window = {
+        position = 'float',
+        width = 30,
+        mapping_options = {
+          noremap = true,
+          nowait = true,
+        },
+        mappings = {
+          ['<cr>'] = 'open', -- Enter:open to edit
+          ['<esc>'] = 'revert_preview', -- Esc: clsoe preview
+          ['P'] = { 'toggle_preview', nowait = false }, -- P: preview
+          ['r'] = 'rename',
+          ['d'] = 'delete',
+          ['m'] = 'move',
+          ['c'] = 'copy_to_clipboard', -- c: copy
+          ['|'] = 'split_with_window_picker', -- |: horizontal split
+          ['\\'] = 'vsplit_with_window_picker', -- \: vertical split
+        },
+      },
+      filesystem = {
+        window = { mappings = { ['.'] = 'set_root' } },
+        follow_current_file = { enabled = true },
+        use_libuv_file_watcher = true,
+        filtered_items = {
+          visible = true,
+          hide_dotfiles = false,
+          hide_gitignored = true,
+        },
+      },
+      buffers = {
+        follow_current_file = { enabled = true },
+        group_empty_dirs = true,
+      },
+      git_status = {
+        window = { position = 'float' },
+      },
+    },
+    config = function(_, opts)
+      require('neo-tree').setup(opts)
+    end,
+  },
   {
     'lewis6991/gitsigns.nvim',
     ft = { 'gitcommit', 'diff' },
@@ -330,7 +397,28 @@ require('lazy').setup({
     },
     config = function()
       require('telescope').setup {
+        sorting_strategy = 'ascending',
+        layout_strategy = 'horizontal',
+        layout_config = { preview_width = 0.6 },
+        path_display = { 'truncate' },
+        pickers = {
+          find_files = {
+            find_command = { 'fd', '--type', 'f', '--hidden', '--exclude=.git' },
+            hidden = true,
+          },
+          live_grep = {
+            additional_args = function()
+              return { '--hidden' }
+            end,
+          },
+        },
         extensions = {
+          fzf = {
+            fuzzy = true,
+            override_generic_sorter = true,
+            override_file_sorter = true,
+            case_mode = 'smart_case',
+          },
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
           },
@@ -359,12 +447,6 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>/', builtin.live_grep, { desc = 'Search all files' })
       vim.keymap.set('n', '<leader>f', builtin.find_files, { desc = 'Search files' })
       vim.keymap.set('n', '<leader>d', builtin.diagnostics, { desc = 'Show diagnostics' })
-      vim.keymap.set('n', '<leader>e', function()
-        require('telescope').extensions.file_browser.file_browser {
-          path = vim.fn.expand '%:p:h',
-          cwd = vim.fn.expand '%:p:h',
-        }
-      end, { desc = 'Open File Browser' })
 
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
@@ -647,11 +729,19 @@ require('lazy').setup({
         clangd = {
           cmd = {
             'clangd',
-            '--clang-tidy',
-            '-j=5',
-            '--malloc-trim',
+            '--background-index',
+            '--header-insertion=never',
           },
           filetypes = { 'c', 'cpp' },
+          root_markers = {
+            '.clangd',
+            '.clang-tidy',
+            '.clang-format',
+            'compile_commands.json',
+            'compile_flags.txt',
+            'configure.ac', -- AutoTools
+            '.git',
+          },
         },
         gopls = {
           cmd = { 'gopls' },
