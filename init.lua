@@ -464,19 +464,6 @@ require('lazy').setup({
     end,
   },
 
-  -- LSP Plugins
-  {
-    -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
-    -- used for completion, annotations and signatures of Neovim apis
-    'folke/lazydev.nvim',
-    ft = 'lua',
-    opts = {
-      library = {
-        -- Load luvit types when the `vim.uv` word is found
-        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
-      },
-    },
-  },
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -492,49 +479,15 @@ require('lazy').setup({
             mode = mode or 'n'
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
-
-          -- Rename the variable under your cursor.
-          --  Most Language Servers support renaming across files, etc.
           map('grn', vim.lsp.buf.rename, '[R]e[n]ame')
-
-          -- Execute a code action, usually your cursor needs to be on top of an error
-          -- or a suggestion from your LSP for this to activate.
           map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
-
-          -- Find references for the word under your cursor.
           map('grr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-
-          -- Jump to the implementation of the word under your cursor.
-          --  Useful when your language has ways of declaring types without an actual implementation.
           map('gri', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-
-          -- Jump to the definition of the word under your cursor.
-          --  This is where a variable was first declared, or where a function is defined, etc.
-          --  To jump back, press <C-t>.
           map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-
-          -- WARN: This is not Goto Definition, this is Goto Declaration.
-          --  For example, in C this would take you to the header.
           map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-
-          -- Fuzzy find all the symbols in your current document.
-          --  Symbols are things like variables, functions, types, etc.
           map('gO', require('telescope.builtin').lsp_document_symbols, 'Open Document Symbols')
-
-          -- Fuzzy find all the symbols in your current workspace.
-          --  Similar to document symbols, except searches over your entire project.
           map('gW', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
-
-          -- Jump to the type of the word under your cursor.
-          --  Useful when you're not sure what type a variable is and you want to see
-          --  the definition of its *type*, not where it was *defined*.
           map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
-
-          -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
-          ---@param client vim.lsp.Client
-          ---@param method vim.lsp.protocol.Method
-          ---@param bufnr? integer some lsp support methods only in specific files
-          ---@return boolean
           local function client_supports_method(client, method, bufnr)
             if vim.fn.has 'nvim-0.11' == 1 then
               return client:supports_method(method, bufnr)
@@ -542,12 +495,6 @@ require('lazy').setup({
               return client.supports_method(method, { bufnr = bufnr })
             end
           end
-
-          -- The following two autocommands are used to highlight references of the
-          -- word under your cursor when your cursor rests there for a little while.
-          --    See `:help CursorHold` for information about when this is executed
-          --
-          -- When you move your cursor, the highlights will be cleared (the second autocommand).
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
             local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
@@ -556,13 +503,11 @@ require('lazy').setup({
               group = highlight_augroup,
               callback = vim.lsp.buf.document_highlight,
             })
-
             vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
               buffer = event.buf,
               group = highlight_augroup,
               callback = vim.lsp.buf.clear_references,
             })
-
             vim.api.nvim_create_autocmd('LspDetach', {
               group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
               callback = function(event2)
@@ -571,11 +516,6 @@ require('lazy').setup({
               end,
             })
           end
-
-          -- The following code creates a keymap to toggle inlay hints in your
-          -- code, if the language server you are using supports them
-          --
-          -- This may be unwanted, since they displace some of your code
           if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
             map('<leader>th', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
@@ -583,9 +523,6 @@ require('lazy').setup({
           end
         end,
       })
-
-      -- Diagnostic Config
-      -- See :help vim.diagnostic.Opts
       vim.diagnostic.config {
         severity_sort = true,
         float = { border = 'rounded', source = 'if_many' },
@@ -612,120 +549,25 @@ require('lazy').setup({
           end,
         },
       }
-
-      local on_attach = function(_, bufnr)
-        -- Enable completion triggered by <c-x><c-o>
+      local on_attach = function(client, bufnr)
+        -- vim.notify('LSP attached: ' .. client.name .. ' to buffer ' .. bufnr, vim.log.levels.DEBUG)
         vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-        -- Mappings.
-        -- See `:help vim.lsp.*` for documentation on any of the below functions
         local bufopts = { noremap = true, silent = true, buffer = bufnr }
-        -- vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
-        -- vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
         vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-        -- vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
         vim.keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-        -- vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, bufopts)
-        -- vim.keymap.set("n", "rn", vim.lsp.buf.rename, bufopts)
-        -- vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts)
       end
-
       local capabilities = require('blink.cmp').get_lsp_capabilities()
-      local lspconfig = require 'lspconfig'
-      local lspconfigs = require 'lspconfig.configs'
-
-      local function get_zls_config()
-        local project_root = vim.fn.getcwd()
-        local zls_json_path = vim.fn.expand '~/.config/zls.json'
-        if string.find(project_root, 'tigerbeetle') then
-          local zig_path = project_root .. '/zig/zig-linux-x86_64-0.13.0/zig'
-          if vim.fn.executable(zig_path) == 0 then
-            vim.notify('Zig 0.13.0 not found at ' .. zig_path, vim.log.levels.ERROR)
-            return {}
-          end
-          local zls_config = {
-            zig_exe_path = zig_path,
-            enable_build_on_save = true,
-            semantic_tokens = 'partial',
-          }
-          local json_content = vim.fn.json_encode(zls_config)
-          vim.fn.mkdir(vim.fn.fnamemodify(zls_json_path, ':h'), 'p')
-          local success, err = pcall(vim.fn.writefile, { json_content }, zls_json_path)
-          if not success then
-            vim.notify('Failed to write zls.json: ' .. err, vim.log.levels.ERROR)
-            return {}
-          end
-          vim.notify('Updated zls.json for TigerBeetle', vim.log.levels.INFO)
-          return {
-            cmd = { '/home/niko/.local/zls-0.13.0/bin/zls' },
-            settings = zls_config,
-            on_init = function()
-              vim.notify('ZLS initialized for TigerBeetle with zig_exe_path=' .. zig_path, vim.log.levels.INFO)
-            end,
-          }
-        else
-          local zig_path = '/usr/bin/zig'
-          if vim.fn.executable(zig_path) == 0 then
-            vim.notify('Zig not found at ' .. zig_path, vim.log.levels.ERROR)
-            return {}
-          end
-          local zls_config = {
-            zig_exe_path = zig_path,
-            enable_build_on_save = true,
-            semantic_tokens = 'partial',
-          }
-          local json_content = vim.fn.json_encode(zls_config)
-          vim.fn.mkdir(vim.fn.fnamemodify(zls_json_path, ':h'), 'p')
-          local success, err = pcall(vim.fn.writefile, { json_content }, zls_json_path)
-          if not success then
-            vim.notify('Failed to write zls.json: ' .. err, vim.log.levels.ERROR)
-            return {}
-          end
-          vim.notify('Updated zls.json for default Zig', vim.log.levels.INFO)
-          return {
-            cmd = { '/home/niko/.local/bin/zls' },
-            settings = zls_config,
-            on_init = function()
-              vim.notify('ZLS initialized with zig_exe_path=' .. zig_path, vim.log.levels.INFO)
-            end,
-          }
-        end
-      end
-
-      vim.api.nvim_create_autocmd('DirChanged', {
-        group = vim.api.nvim_create_augroup('TigerBeetleLSP', { clear = true }),
-        callback = function()
-          local clients = vim.lsp.get_active_clients { name = 'zls' }
-          for _, client in ipairs(clients) do
-            vim.lsp.stop_client(client.id)
-          end
-          vim.defer_fn(function()
-            local config = get_zls_config()
-            if next(config) ~= nil then
-              require('lspconfig').zls.setup(vim.tbl_deep_extend('force', {
-                capabilities = require('blink.cmp').get_lsp_capabilities(),
-                on_attach = function(client, bufnr)
-                  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-                  local bufopts = { buffer = bufnr, noremap = true, silent = true }
-                  vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-                  vim.keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-                end,
-              }, config))
-            end
-          end, 100)
-        end,
-      })
-
-      lspconfig.zls.setup(vim.tbl_deep_extend('force', {
-        capabilities = capabilities,
-        on_attach = function(_, bufnr)
-          vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-          local bufopts = { noremap = true, silent = true, buffer = bufnr }
-          vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-          vim.keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, bufopts)
-        end,
-      }, get_zls_config()))
-
+      -- Ensure zig filetype detection
       local servers = {
+        zls = {
+          cmd = { 'zls' },
+          filetypes = { 'zig', 'zon', 'zir' },
+          settings = {
+            zig_exe_path = '/usr/bin/zig',
+            enable_build_on_save = true,
+            semantic_tokens = 'partial',
+          },
+        },
         clangd = {
           cmd = {
             'clangd',
@@ -739,7 +581,7 @@ require('lazy').setup({
             '.clang-format',
             'compile_commands.json',
             'compile_flags.txt',
-            'configure.ac', -- AutoTools
+            'configure.ac',
             '.git',
           },
         },
@@ -767,25 +609,6 @@ require('lazy').setup({
             },
           },
         },
-
-        -- asm_lsp = { //idk doesnt work correctly with go asm
-
-        --   cmd = { 'asm-lsp' },
-        --   filetypes = { 'asm', 's', 'S' },
-        --   capabilities = capabilities,
-        -- },
-
-        -- zls = {
-        --   filetypes = { 'zig', 'zon', 'zir' },
-        --   cmd = { '/home/niko/.local/bin/zls' },
-        --   settings = {
-        --     enable_build_on_save = true,
-        --     semantic_tokens = 'partial',
-        --
-        --     zig_exe_path = '/usr/bin/zig-bin-0.14.1',
-        --   },
-        -- },
-        -- pyright = {},
         rust_analyzer = {
           cmd = { 'rust-analyzer' },
           filetypes = { 'rust' },
@@ -795,18 +618,15 @@ require('lazy').setup({
             },
           },
         },
-
         dockerls = {
           cmd = { 'docker-language-server', 'start', '--verbose', '--debug', '--stdio' },
           filetypes = { 'yaml.docker-compose', 'dockerfile' },
           root_markers = { 'Dockerfile', 'docker-compose.yaml', 'docker-compose.yml', 'compose.yaml', 'compose.yml', '.git' },
         },
-
         buf_ls = {
           cmd = { 'buf-language-server' },
           filetypes = { 'proto' },
         },
-
         lua_ls = {
           settings = {
             Lua = {
@@ -818,17 +638,24 @@ require('lazy').setup({
           },
         },
       }
-
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
       })
-
       for server, config in pairs(servers) do
-        lspconfig[server].setup(vim.tbl_deep_extend('force', {
-          capabilities = capabilities,
-          on_attach = on_attach,
-        }, config))
+        -- vim.notify('Configuring LSP server: ' .. server, vim.log.levels.DEBUG)
+        vim.lsp.config(
+          server,
+          vim.tbl_deep_extend('force', {
+            capabilities = capabilities,
+            on_attach = on_attach,
+          }, config)
+        )
+        -- vim.notify('Enabling LSP server: ' .. server, vim.log.levels.DEBUG)
+        local success, err = pcall(vim.lsp.enable, server)
+        if not success then
+          vim.notify('Failed to enable ' .. server .. ': ' .. vim.inspect(err), vim.log.levels.ERROR)
+        end
       end
     end,
   },
