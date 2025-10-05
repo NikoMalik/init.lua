@@ -42,6 +42,60 @@ vim.api.nvim_create_autocmd({ 'InsertEnter', 'InsertLeave' }, {
   end,
 })
 
+local function interactive_replace()
+  local mode = vim.fn.mode(1)
+  local is_visual = mode:match '^[vV\022]'
+  local start_pos, end_pos
+  if is_visual then
+    start_pos = vim.fn.getpos "'<"
+    end_pos = vim.fn.getpos "'>"
+    if start_pos[2] == 0 or end_pos[2] == 0 then
+      vim.notify('Visual marks not set properly, aborting', vim.log.levels.ERROR)
+      return
+    end
+    vim.notify('Visual mode detected, start: ' .. vim.inspect(start_pos) .. ', end: ' .. vim.inspect(end_pos), vim.log.levels.DEBUG)
+  end
+
+  vim.ui.input({ prompt = 'Yo! Enter what you want to replace: ' }, function(search)
+    if not search or search == '' then
+      vim.notify('Search canceled: string empty', vim.log.levels.WARN)
+      return
+    end
+    vim.ui.input({ prompt = 'Enter new string (leave empty to delete): ' }, function(replace)
+      if replace == nil then
+        vim.notify('Replace canceled: string not entered', vim.log.levels.WARN)
+        return
+      end
+      replace = replace or ''
+
+      local cmd
+      if is_visual then
+        vim.cmd 'normal! gv'
+        cmd = string.format("'<,'>s/%s/%s/g", vim.fn.escape(search, '/'), vim.fn.escape(replace, '/'))
+      else
+        cmd = string.format('%%s/%s/%s/g', vim.fn.escape(search, '/'), vim.fn.escape(replace, '/'))
+      end
+      local scope = is_visual and 'selected scope' or 'entire file'
+      vim.notify('Performing replace in ' .. scope .. ': "' .. search .. '" → "' .. replace .. '"', vim.log.levels.INFO)
+
+      local success, err = pcall(vim.cmd, cmd)
+      if not success then
+        vim.notify('Error during replace: ' .. tostring(err), vim.log.levels.ERROR)
+      end
+    end)
+  end)
+end
+
+vim.keymap.set({ 'n', 'v' }, '<leader>rr', function()
+  if vim.fn.mode(1):match '^[vV\022]' then
+    vim.cmd 'normal! gv'
+    vim.notify('Restored visual selection', vim.log.levels.DEBUG)
+  end
+  interactive_replace()
+end, { desc = '[R]eplace [R]eplace String (scope or file)' })
+
+vim.api.nvim_create_user_command('ReplaceString', interactive_replace, { desc = 'Interactive replace' })
+
 vim.keymap.set('n', '<leader>[', function()
   vim.diagnostic.open_float(nil, { focusable = false })
 end, { desc = 'LSP diagnostics float' })
