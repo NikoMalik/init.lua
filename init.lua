@@ -1,5 +1,7 @@
+local orig_notify = vim.notify
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+vim.o.winborder = 'rounded'
 
 vim.keymap.set('n', '<C-j>', ':m .+1<CR>==')
 vim.keymap.set('n', '<C-k>', ':m .-2<CR>==')
@@ -47,9 +49,9 @@ vim.api.nvim_create_autocmd('BufEnter', {
 
 vim.keymap.set('n', '\\', '<cmd>:vsplit <CR>', { desc = 'Vertical Split' })
 vim.keymap.set('n', '|', ':split<CR>', { desc = 'Horizontal Split' })
--- vim.cmd.colorscheme 'habamax' -- super great but a litle bit smoke
--- vim.cmd.colorscheme 'desert' -- or slate
+-- vim.cmd.colorscheme 'dosbox' -- super great but a litle bit smoke
 vim.cmd.colorscheme 'dangion'
+
 vim.api.nvim_create_autocmd({ 'InsertEnter', 'InsertLeave' }, {
   callback = function(event)
     vim.o.relativenumber = event.event == 'InsertLeave'
@@ -185,7 +187,7 @@ vim.o.inccommand = 'split'
 vim.o.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.o.scrolloff = 10
+vim.o.scrolloff = 5
 vim.o.tabstop = 4
 vim.o.ttyfast = true
 vim.o.softtabstop = 4
@@ -403,6 +405,7 @@ require('lazy').setup({
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
+    preset = 'helix',
     opts = {
       -- delay between pressing a key and opening which-key (milliseconds)
       -- this setting is independent of vim.o.timeoutlen
@@ -489,9 +492,6 @@ require('lazy').setup({
           ['>'] = { char = '', hl_group = 'ObsidianRightArrow' },
           ['~'] = { char = '󰰱', hl_group = 'ObsidianTilde' },
           ['!'] = { char = '', hl_group = 'ObsidianImportant' },
-          -- Replace the above with this if you don't have a patched font:
-          -- [" "] = { char = "☐", hl_group = "ObsidianTodo" },
-          -- ["x"] = { char = "✔", hl_group = "ObsidianDone" },
 
           -- You can also add more custom ones...
         },
@@ -753,6 +753,9 @@ require('lazy').setup({
         nix = {
           cmd = { 'nixd' },
           filetypes = { 'nix' },
+          formatting = {
+            command = { 'nixfmt' },
+          },
         },
         clangd = {
           cmd = {
@@ -798,16 +801,33 @@ require('lazy').setup({
         rust_analyzer = {
           cmd = { 'rust-analyzer' },
           filetypes = { 'rust' },
+          root_markers = { 'Cargo.toml', 'rust-project.json' },
           settings = {
             ['rust-analyzer'] = {
-              checkOnSave = { command = 'clippy' },
+              rust = {
+                sysroot = 'none',
+              },
+              cargo = {
+                loadOutDirsFromCheck = true,
+              },
+            },
+            checkOnSave = {
+              allFeatures = false,
+              command = 'clippy',
+              extraArgs = { '--no-deps' },
+            },
+            procMacro = {
+              enable = true,
+              ignored = {
+                ['async-trait'] = { 'async_trait' },
+                ['napi-derive'] = { 'napi' },
+                ['async-recursion'] = { 'async_recursion' },
+              },
             },
           },
         },
         dockerls = {
-          cmd = { 'docker-language-server', 'start', '--verbose', '--debug', '--stdio' },
-          filetypes = { 'yaml.docker-compose', 'dockerfile' },
-          root_markers = { 'Dockerfile', 'docker-compose.yaml', 'docker-compose.yml', 'compose.yaml', 'compose.yml', '.git' },
+          cmd = { 'docker-langserver', '--stdio' },
         },
         buf_ls = {
           cmd = { 'buf-language-server' },
@@ -828,6 +848,22 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
       })
+
+      vim.notify = function(msg, log_level, opts)
+        if opts and opts.client_id then
+          local client = vim.lsp.get_client_by_id(opts.client_id)
+          if client and client.name == 'rust_analyzer' or 'rust-analyzer' then
+            return
+          end
+        end
+
+        if opts and opts.client_name == 'rust_analyzer' or 'rust-analyzer' then
+          return
+        end
+
+        orig_notify(msg, log_level, opts)
+      end
+
       for server, config in pairs(servers) do
         -- vim.notify('Configuring LSP server: ' .. server, vim.log.levels.DEBUG)
         vim.lsp.config(
@@ -867,7 +903,7 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         go = { 'goimports', 'gofmt' },
-        nix = { 'alejandra' },
+        nix = { 'nixfmt' },
         json = { 'biome' },
         jsonc = { 'biome' },
         rust = { 'rustfmt' },
