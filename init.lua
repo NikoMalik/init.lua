@@ -907,15 +907,32 @@ require('lazy').setup({
         json = { 'biome' },
         jsonc = { 'biome' },
         rust = { 'rustfmt' },
-        yaml = { 'yamlfmt' },
+        yaml = { 'prettier', 'yamlfmt' },
         asm = { 'asmfmt' }, -- go asm
         proto = { 'buf format' },
         c = { 'clang-format' },
         cpp = { 'clang-format' },
         markdown = { 'marksman' },
         zig = { 'zig fmt' },
+        sql = { 'pgformatter' },
       },
       formatters = {
+        pgformatter = {
+          options = {
+            function_case = 2,
+            keyword_case = 2,
+            spaces = 2,
+            comma_break = true,
+            comma_end = false,
+          },
+        },
+        yamlfmt = {
+          options = {
+            indent = 2,
+            line_ending = 'lf',
+            keep_quotes = true,
+          },
+        },
         sleek = {
           command = 'sleek',
           args = { '$FILENAME' },
