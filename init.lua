@@ -13,6 +13,7 @@ vim.keymap.set('n', '<leader>bb', '<cmd>buffers<cr>:buffer<space>', { desc = '[B
 vim.keymap.set('n', '<Tab>', '<cmd>BufferNext<cr>', { desc = 'Next buffer' })
 vim.keymap.set('n', '<S-Tab>', '<cmd>BufferPrevious<cr>', { desc = 'Prev buffer' })
 vim.keymap.set('n', '<leader>bo', '<cmd>%bd|e#|bd#<cr>', { desc = '[B]uffer [O]nly (close others)' })
+vim.keymap.set('n', '<C-c>', '<cmd>BufferClose<cr>', { desc = 'Close Current Buffer' })
 
 vim.g.maplocalleader = ' '
 vim.o.winborder = 'rounded'
@@ -383,12 +384,14 @@ require('lazy').setup({
       vim.g.barbar_auto_setup = false
     end,
     opts = {
+      highlight_inactive_file_icons = true,
 
       icons = {
         -- Configure the base icons on the bufferline.
         -- Valid options to display the buffer index and -number are `true`, 'superscript' and 'subscript'
-        buffer_index = false,
+        buffer_index = true,
         buffer_number = false,
+
         button = '',
         -- Enables / disables diagnostic symbols
         diagnostics = {
@@ -412,13 +415,13 @@ require('lazy').setup({
         },
 
         -- Use a preconfigured buffer appearance— can be 'default', 'powerline', or 'slanted'
-        preset = 'powerline',
+        preset = 'slanted',
 
         -- Configure the icons on the bufferline based on the visibility of a buffer.
         -- Supports all the base icon options, plus `modified` and `pinned`.
         alternate = { filetype = { enabled = false } },
         current = { buffer_index = true },
-        inactive = { button = '×' },
+        inactive = { button = '×', buffer_index = true },
         visible = { modified = { buffer_number = false } },
       },
       auto_hide = true,
