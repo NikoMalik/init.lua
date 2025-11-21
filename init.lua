@@ -14,9 +14,46 @@ vim.keymap.set('n', '<Tab>', '<cmd>BufferNext<cr>', { desc = 'Next buffer' })
 vim.keymap.set('n', '<S-Tab>', '<cmd>BufferPrevious<cr>', { desc = 'Prev buffer' })
 vim.keymap.set('n', '<leader>bo', '<cmd>%bd|e#|bd#<cr>', { desc = '[B]uffer [O]nly (close others)' })
 vim.keymap.set('n', '<C-c>', '<cmd>BufferClose<cr>', { desc = 'Close Current Buffer' })
+vim.keymap.set('n', '<leader>e', '<cmd>NvimTreeFocus<CR>', { desc = 'focus Neo-tree' })
+vim.keymap.set('n', '<C-n>', '<cmd>NvimTreeToggle<CR>', { desc = 'nvimtree toggle window' })
+vim.keymap.set('n', '<leader>ft', '<cmd>TodoTelescope<CR>', { desc = 'Find Todo' })
 
 vim.g.maplocalleader = ' '
 vim.o.winborder = 'rounded'
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+-- auto close
+local function is_modified_buffer_open(buffers)
+  for _, v in pairs(buffers) do
+    if v.name:match 'NvimTree_' == nil then
+      return true
+    end
+  end
+  return false
+end
+
+vim.api.nvim_create_autocmd('BufEnter', {
+  nested = true,
+  callback = function()
+    if
+      #vim.api.nvim_list_wins() == 1
+      and vim.api.nvim_buf_get_name(0):match 'NvimTree_' ~= nil
+      and is_modified_buffer_open(vim.fn.getbufinfo { bufmodified = 1 }) == false
+    then
+      vim.cmd 'quit'
+    end
+  end,
+})
+--resize
+vim.api.nvim_create_autocmd('VimResized', {
+  group = vim.api.nvim_create_augroup('resize_splits', { clear = true }),
+  callback = function()
+    local current_tab = vim.fn.tabpagenr()
+    vim.cmd 'tabdo wincmd ='
+    vim.cmd('tabnext ' .. current_tab)
+  end,
+})
 
 vim.keymap.set('n', '<C-j>', ':m .+1<CR>==')
 vim.keymap.set('n', '<C-k>', ':m .-2<CR>==')
@@ -215,6 +252,11 @@ vim.o.breakindent = true
 vim.o.hlsearch = false
 vim.o.incsearch = true
 vim.o.confirm = false
+local signs = { Error = ' ', Warn = ' ', Hint = ' ', Info = ' ' }
+for type, icon in pairs(signs) do
+  local hl = 'DiagnosticSign' .. type
+  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+end
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
@@ -250,7 +292,7 @@ rtp:prepend(lazypath)
 require('lazy').setup({
   performance = {
     cache = {
-      enabled = true,
+      enabled = false,
     },
     rtp = {
       disabled_plugins = {
@@ -291,90 +333,117 @@ require('lazy').setup({
     },
   },
   'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
+  {
+    'nvim-tree/nvim-tree.lua',
+    requires = { 'nvim-tree/nvim-web-devicons' },
+    cmd = { 'NvimTreeToggle', 'NvimTreeFocus' },
+    opts = {
+      filters = { dotfiles = false },
+      disable_netrw = true,
+      hijack_cursor = true,
+      sync_root_with_cwd = true,
+      update_focused_file = {
+        enable = true,
+        update_root = false,
+      },
+      actions = {
+        open_file = {
+          resize_window = true,
+        },
+      },
+      view = {
+        width = 30,
+        preserve_window_proportions = true,
+        adaptive_size = true,
+      },
+      renderer = {
+        root_folder_label = false,
+        highlight_opened_files = 'name',
+        highlight_git = true,
+        indent_markers = { enable = true },
+        icons = {
+          glyphs = {
+            default = '󰈚',
+            folder = {
+              default = '',
+              empty = '',
+              empty_open = '',
+              open = '',
+              symlink = '',
+            },
+            git = { unmerged = '' },
+          },
+        },
+      },
+    },
+  },
 
   -- {
-  --   'OXY2DEV/markview.nvim',
-  --   lazy = false,
-  --   priority = 49, -- default - 1
+  --   'nvim-neo-tree/neo-tree.nvim',
+  --   version = 'v3.x',
   --   dependencies = {
-  --     'nvim-treesitter/nvim-treesitter',
+  --     'nvim-lua/plenary.nvim',
   --     'nvim-tree/nvim-web-devicons',
+  --     'MunifTanjim/nui.nvim',
+  --     's1n7ax/nvim-window-picker',
+  --   },
+  --   cmd = 'Neotree',
+  --   keys = {
+  --     { '<leader>e', '<cmd>Neotree toggle<CR>', desc = 'Toggle Neo-tree' },
   --   },
   --   opts = {
-  --     headings = {
-  --       heading_1 = { sign = '' },
-  --       heading_2 = { sign = '' },
+  --     action = 'show',
+  --     hijack_netrw_behavior = 'disabled',
+  --
+  --     auto_close = true,
+  --     show = true,
+  --     popup_border_style = 'NC',
+  --     close_if_last_window = true,
+  --     sources = { 'filesystem', 'buffers', 'git_status' },
+  --     window = {
+  --       action = 'show',
+  --       position = 'left',
+  --       width = 30,
+  --       mapping_options = {
+  --         noremap = true,
+  --         nowait = true,
+  --       },
+  --       mappings = {
+  --         ['<cr>'] = 'open', -- Enter:open to edit
+  --         ['<esc>'] = 'revert_preview', -- Esc: clsoe preview
+  --         ['P'] = { 'toggle_preview', nowait = false }, -- P: preview
+  --         ['r'] = 'rename',
+  --         ['d'] = 'delete',
+  --         ['m'] = 'move',
+  --         ['c'] = 'copy_to_clipboard', -- c: copy
+  --         ['|'] = 'split_with_window_picker', -- |: horizontal split
+  --         ['\\'] = 'vsplit_with_window_picker', -- \: vertical split
+  --       },
   --     },
-  --     code_blocks = { sign = false },
+  --     filesystem = {
+  --       window = { mappings = { ['.'] = 'set_root' } },
+  --       follow_current_file = { enabled = true },
+  --       use_libuv_file_watcher = true,
+  --       action = 'show',
+  --       filtered_items = {
+  --         visible = true,
+  --         hide_dotfiles = false,
+  --         hide_gitignored = true,
+  --       },
+  --       use_libuv_file_watcher = true,
+  --     },
+  --     buffers = {
+  --       follow_current_file = { enabled = true },
+  --       group_empty_dirs = true,
+  --     },
+  --     git_status = {
+  --       window = { position = 'float' },
+  --     },
   --   },
+  --   config = function(_, opts)
+  --     require('neo-tree').setup(opts)
+  --   end,
   -- },
-
-  {
-    'nvim-neo-tree/neo-tree.nvim',
-    version = 'v3.x',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'nvim-tree/nvim-web-devicons',
-      'MunifTanjim/nui.nvim',
-      's1n7ax/nvim-window-picker',
-    },
-    cmd = 'Neotree',
-    keys = {
-      { '<leader>e', '<cmd>Neotree toggle<CR>', desc = 'Toggle Neo-tree' },
-    },
-    opts = {
-      action = 'show',
-      hijack_netrw_behavior = 'disabled',
-
-      auto_close = true,
-      show = true,
-      popup_border_style = 'NC',
-      close_if_last_window = true,
-      sources = { 'filesystem', 'buffers', 'git_status' },
-      window = {
-        action = 'show',
-        position = 'left',
-        width = 30,
-        mapping_options = {
-          noremap = true,
-          nowait = true,
-        },
-        mappings = {
-          ['<cr>'] = 'open', -- Enter:open to edit
-          ['<esc>'] = 'revert_preview', -- Esc: clsoe preview
-          ['P'] = { 'toggle_preview', nowait = false }, -- P: preview
-          ['r'] = 'rename',
-          ['d'] = 'delete',
-          ['m'] = 'move',
-          ['c'] = 'copy_to_clipboard', -- c: copy
-          ['|'] = 'split_with_window_picker', -- |: horizontal split
-          ['\\'] = 'vsplit_with_window_picker', -- \: vertical split
-        },
-      },
-      filesystem = {
-        window = { mappings = { ['.'] = 'set_root' } },
-        follow_current_file = { enabled = true },
-        use_libuv_file_watcher = true,
-        action = 'show',
-        filtered_items = {
-          visible = true,
-          hide_dotfiles = false,
-          hide_gitignored = true,
-        },
-        use_libuv_file_watcher = true,
-      },
-      buffers = {
-        follow_current_file = { enabled = true },
-        group_empty_dirs = true,
-      },
-      git_status = {
-        window = { position = 'float' },
-      },
-    },
-    config = function(_, opts)
-      require('neo-tree').setup(opts)
-    end,
-  },
   {
     'romgrk/barbar.nvim',
     dependencies = {
@@ -415,7 +484,7 @@ require('lazy').setup({
         },
 
         -- Use a preconfigured buffer appearance— can be 'default', 'powerline', or 'slanted'
-        preset = 'slanted',
+        preset = 'default',
 
         -- Configure the icons on the bufferline based on the visibility of a buffer.
         -- Supports all the base icon options, plus `modified` and `pinned`.
@@ -657,7 +726,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons', enabled = true },
     },
     config = function()
       require('telescope').setup {
