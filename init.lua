@@ -55,6 +55,24 @@ vim.api.nvim_create_autocmd('VimResized', {
   end,
 })
 
+local max_buffers = 9
+
+local function trim_buffers()
+  local buffers = vim.fn.getbufinfo { buflisted = 1 }
+  if #buffers > max_buffers then
+    for i = 1, #buffers - max_buffers do
+      local buf = buffers[i]
+      if vim.api.nvim_buf_get_option(buf.bufnr, 'modified') == false then
+        vim.cmd('bwipeout ' .. buf.bufnr)
+      end
+    end
+  end
+end
+
+vim.api.nvim_create_autocmd('BufAdd', {
+  callback = trim_buffers,
+})
+
 vim.keymap.set('n', '<C-j>', ':m .+1<CR>==')
 vim.keymap.set('n', '<C-k>', ':m .-2<CR>==')
 vim.keymap.set('v', '<C-j>', ":m '>+1<CR>gv=gv")
@@ -332,13 +350,46 @@ require('lazy').setup({
       },
     },
   },
+
+  {
+    'isakbm/gitgraph.nvim',
+    opts = {
+      git_cmd = 'git',
+      symbols = {
+        merge_commit = 'M',
+        commit = '*',
+      },
+      format = {
+        timestamp = '%H:%M:%S %d-%m-%Y',
+        fields = { 'hash', 'timestamp', 'author', 'branch_name', 'tag' },
+      },
+      hooks = {
+        on_select_commit = function(commit)
+          print('selected commit:', commit.hash)
+        end,
+        on_select_range_commit = function(from, to)
+          print('selected range:', from.hash, to.hash)
+        end,
+      },
+    },
+    keys = {
+      {
+        '<leader>gl',
+        function()
+          require('gitgraph').draw({}, { all = true, max_count = 5000 })
+        end,
+        desc = 'GitGraph - Draw',
+      },
+    },
+  },
+
   'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
   {
     'nvim-tree/nvim-tree.lua',
     requires = { 'nvim-tree/nvim-web-devicons' },
     cmd = { 'NvimTreeToggle', 'NvimTreeFocus' },
     opts = {
-      filters = { dotfiles = false },
+      filters = { dotfiles = false, enable = false },
       disable_netrw = true,
       hijack_cursor = true,
       sync_root_with_cwd = true,
