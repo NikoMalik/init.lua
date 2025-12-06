@@ -1,3 +1,16 @@
+vim.g.loaded_gzip = 1
+vim.g.loaded_tar = 1
+vim.g.loaded_tarPlugin = 1
+vim.g.loaded_zip = 1
+vim.g.loaded_zipPlugin = 1
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+vim.g.loaded_netrwSettings = 1
+vim.g.loaded_netrwFileHandlers = 1
+vim.g.loaded_node_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
 local orig_notify = vim.notify
 vim.g.mapleader = ' '
 vim.keymap.set('n', '<leader>1', '<cmd>BufferGoto 1<cr>', { desc = 'buffer 1' })
@@ -22,29 +35,31 @@ vim.g.maplocalleader = ' '
 vim.o.winborder = 'rounded'
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
+-- vim.o.autocomplete = true
 
--- auto close
-local function is_modified_buffer_open(buffers)
-  for _, v in pairs(buffers) do
-    if v.name:match 'NvimTree_' == nil then
-      return true
-    end
-  end
-  return false
-end
+-- -- auto close
+-- local function is_modified_buffer_open(buffers)
+--   for _, v in pairs(buffers) do
+--     if v.name:match 'NvimTree_' == nil then
+--       return true
+--     end
+--   end
+--   return false
+-- end
+--
+-- vim.api.nvim_create_autocmd('BufEnter', {
+--   nested = true,
+--   callback = function()
+--     if
+--       #vim.api.nvim_list_wins() == 1
+--       and vim.api.nvim_buf_get_name(0):match 'NvimTree_' ~= nil
+--       and is_modified_buffer_open(vim.fn.getbufinfo { bufmodified = 1 }) == false
+--     then
+--       vim.cmd 'quit'
+--     end
+--   end,
+-- })
 
-vim.api.nvim_create_autocmd('BufEnter', {
-  nested = true,
-  callback = function()
-    if
-      #vim.api.nvim_list_wins() == 1
-      and vim.api.nvim_buf_get_name(0):match 'NvimTree_' ~= nil
-      and is_modified_buffer_open(vim.fn.getbufinfo { bufmodified = 1 }) == false
-    then
-      vim.cmd 'quit'
-    end
-  end,
-})
 --resize
 vim.api.nvim_create_autocmd('VimResized', {
   group = vim.api.nvim_create_augroup('resize_splits', { clear = true }),
@@ -89,8 +104,6 @@ vim.keymap.set('n', '<C-k>', '<C-w>k')
 vim.keymap.set('n', ';', ':')
 vim.keymap.set('n', 'j', 'gj', { silent = true })
 vim.keymap.set('n', 'k', 'gk', { silent = true })
-vim.keymap.set('n', '<leader>s', ':%s//<left>')
-vim.keymap.set('v', '<leader>s', ':s//<left>')
 vim.keymap.set('n', '<CR>', ':nohlsearch<CR><CR>')
 vim.keymap.set('n', '<leader>h', ':silent! !tmux popup -d "#{pane_current_path}" -xC -yC -w80\\% -h80\\% -E >/dev/null 2>&1<CR>')
 vim.keymap.set('n', '<leader>v', ':silent! !tmux split-window -v -p 20 >/dev/null 2>&1<CR>')
@@ -219,7 +232,7 @@ end)
 
 -- Save undo history
 vim.o.undofile = true
-vim.o.smoothscroll = true
+vim.o.smoothscroll = false
 vim.o.guicursor = ''
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
@@ -262,7 +275,7 @@ vim.o.tabstop = 4
 vim.o.ttyfast = true
 vim.o.softtabstop = 4
 vim.o.shiftwidth = 4
--- vim.o.lazyredraw = true
+vim.o.lazyredraw = false
 vim.o.expandtab = false
 vim.o.autoindent = true
 vim.o.smartindent = true
@@ -308,9 +321,10 @@ rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
+  defaults = { lazy = true },
   performance = {
     cache = {
-      enabled = false,
+      enabled = true,
     },
     rtp = {
       disabled_plugins = {
@@ -505,6 +519,9 @@ require('lazy').setup({
     end,
     opts = {
       highlight_inactive_file_icons = true,
+      hide = { extensions = false, inactive = false },
+      focus_on_close = 'left',
+      maximum_length = 9,
 
       icons = {
         -- Configure the base icons on the bufferline.
@@ -536,6 +553,7 @@ require('lazy').setup({
 
         -- Use a preconfigured buffer appearance— can be 'default', 'powerline', or 'slanted'
         preset = 'default',
+        maximum_length = 25,
 
         -- Configure the icons on the bufferline based on the visibility of a buffer.
         -- Supports all the base icon options, plus `modified` and `pinned`.
@@ -546,7 +564,7 @@ require('lazy').setup({
       },
       auto_hide = true,
       -- lazy.nvim will automatically call setup for you. put your options here, anything missing will use the default:
-      -- animation = true,
+      animation = false,
       -- insert_at_start = true,
       -- …etc.
     },
@@ -578,7 +596,7 @@ require('lazy').setup({
         topdelete = { text = '‾' },
         changedelete = { text = '~' },
       },
-      current_line_blame = true,
+      current_line_blame = false,
       current_line_blame_opts = {
         virt_text = true,
         virt_text_pos = 'eol',
@@ -1224,9 +1242,102 @@ require('lazy').setup({
 
       snippets = { preset = 'luasnip' },
 
-      fuzzy = { implementation = 'lua' },
+      fuzzy = { implementation = 'rust' },
 
       signature = { enabled = true },
+    },
+  },
+  {
+    'pteroctopus/faster.nvim',
+    opts = {
+      -- Behaviour table contains configuration for behaviours faster.nvim uses
+      behaviours = {
+        -- Fast macro configuration controls disabling and enabling features when
+        -- macro is executed
+        fastmacro = {
+          -- Behaviour can be turned on or off. To turn on set to true, otherwise
+          -- set to false
+          on = true,
+          -- Table which contains names of features that will be disabled when
+          -- macro is executed. Feature names can be seen in features table below.
+          -- features_disabled can also be set to "all" and then all features that
+          -- are on (on=true) are going to be disabled for this behaviour.
+          -- Specificaly:
+          -- * lualine plugin is disabled when macros are executed because
+          -- if a recursive macro opens a buffer on every iteration this error will
+          -- happen after 300-400 hundred iterations:
+          -- `E5108: Error executing lua Vim:E903: Process failed to start: too many open files: "/usr/bin/git"`
+          -- * mini.clue plugin is disabled when macros are executed because it breaks execution of some macros
+          features_disabled = { 'lualine', 'mini_clue' },
+        },
+      },
+      -- Feature table contains configuration for features faster.nvim will disable
+      -- and enable according to rules defined in behaviours.
+      -- Defined feature will be used by faster.nvim only if it is on (`on=true`).
+      -- Defer will be used if some features need to be disabled after others.
+      -- defer=false features will be disabled first and defer=true features last.
+      features = {
+        -- Neovim filetype plugin
+        -- https://neovim.io/doc/user/filetype.html
+        filetype = {
+          on = true,
+          defer = true,
+        },
+        -- Illuminate plugin
+        -- https://github.com/RRethy/vim-illuminate
+        illuminate = {
+          on = true,
+          defer = false,
+        },
+        -- Indent Blankline
+        -- https://github.com/lukas-reineke/indent-blankline.nvim
+        indent_blankline = {
+          on = true,
+          defer = false,
+        },
+        -- Neovim LSP
+        -- https://neovim.io/doc/user/lsp.html
+        lsp = {
+          on = true,
+          defer = false,
+        },
+        -- Lualine
+        -- https://github.com/nvim-lualine/lualine.nvim
+        lualine = {
+          on = true,
+          defer = false,
+        },
+        -- Neovim Pi_paren plugin
+        -- https://neovim.io/doc/user/pi_paren.html
+        matchparen = {
+          on = true,
+          defer = false,
+        },
+        -- Neovim syntax
+        -- https://neovim.io/doc/user/syntax.html
+        syntax = {
+          on = true,
+          defer = true,
+        },
+        -- Neovim treesitter
+        -- https://neovim.io/doc/user/treesitter.html
+        treesitter = {
+          on = true,
+          defer = false,
+        },
+        -- Neovim options that affect speed when big file is opened:
+        -- swapfile, foldmethod, undolevels, undoreload, list
+        vimopts = {
+          on = true,
+          defer = false,
+        },
+        -- Mini.clue
+        -- https://github.com/nvim-mini/mini.clue
+        mini_clue = {
+          on = true,
+          defer = false,
+        },
+      },
     },
   },
 
@@ -1435,11 +1546,21 @@ require('lazy').setup({
         'rust',
         'proto',
       },
+      incremental_selection = {
+        enable = true,
+        keymaps = {
+          init_selection = 'gnn', -- set to `false` to disable one of the mappings
+          node_incremental = 'grn',
+          scope_incremental = 'grc',
+          node_decremental = 'grm',
+        },
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
         enable = true,
         additional_vim_regex_highlighting = false,
+        use_languagetree = true,
       },
       indent = { enable = true, disable = { 'ruby' } },
     },
