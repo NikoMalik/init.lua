@@ -122,13 +122,13 @@ vim.api.nvim_create_user_command('JournalToday', function()
 end, {})
 vim.keymap.set('n', '<leader>jn', ':JournalToday<CR>', { desc = 'Open today’s journal' })
 
-vim.api.nvim_create_autocmd('BufEnter', {
-  callback = function(opts)
-    if vim.bo[opts.buf].filetype == 'markdown' then
-      vim.opt.conceallevel = 2
-    end
-  end,
-})
+-- vim.api.nvim_create_autocmd('BufEnter', {
+--   callback = function(opts)
+--     if vim.bo[opts.buf].filetype == 'markdown' then
+--       vim.opt.conceallevel = 0
+--     end
+--   end,
+-- })
 
 vim.keymap.set('n', '\\', '<cmd>:vsplit <CR>', { desc = 'Vertical Split' })
 vim.keymap.set('n', '|', ':split<CR>', { desc = 'Horizontal Split' })
@@ -223,7 +223,7 @@ vim.o.termguicolors = true
 vim.o.showmode = false
 
 vim.opt.swapfile = false
-vim.cmd 'setlocal conceallevel=2'
+vim.cmd 'setlocal conceallevel=0'
 vim.o.list = false
 
 vim.schedule(function()
@@ -1196,6 +1196,7 @@ require('lazy').setup({
     'saghen/blink.cmp',
     event = 'VimEnter',
     version = '1.*',
+    build = '...',
     dependencies = {
       -- Snippet Engine
       {
