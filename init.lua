@@ -13,20 +13,39 @@ vim.g.loaded_perl_provider = 0
 vim.g.loaded_ruby_provider = 0
 local orig_notify = vim.notify
 vim.g.mapleader = ' '
-vim.keymap.set('n', '<leader>1', '<cmd>BufferGoto 1<cr>', { desc = 'buffer 1' })
-vim.keymap.set('n', '<leader>2', '<cmd>BufferGoto 2<cr>', { desc = 'buffer 2' })
-vim.keymap.set('n', '<leader>3', '<cmd>BufferGoto 3<cr>', { desc = 'buffer 3' })
-vim.keymap.set('n', '<leader>4', '<cmd>BufferGoto 4<cr>', { desc = 'buffer 4' })
-vim.keymap.set('n', '<leader>5', '<cmd>BufferGoto 5<cr>', { desc = 'buffer 5' })
-vim.keymap.set('n', '<leader>6', '<cmd>BufferGoto 6<cr>', { desc = 'buffer 6' })
-vim.keymap.set('n', '<leader>7', '<cmd>BufferGoto 7<cr>', { desc = 'buffer 7' })
-vim.keymap.set('n', '<leader>8', '<cmd>BufferGoto 8<cr>', { desc = 'buffer 8' })
-vim.keymap.set('n', '<leader>9', '<cmd>BufferGoto 9<cr>', { desc = 'buffer 9' })
+vim.keymap.set('n', '<leader>1', function()
+  require('bufferline').go_to_buffer(1)
+end, { desc = 'buffer 1' })
+vim.keymap.set('n', '<leader>2', function()
+  require('bufferline').go_to_buffer(2)
+end, { desc = 'buffer 2' })
+vim.keymap.set('n', '<leader>3', function()
+  require('bufferline').go_to_buffer(3)
+end, { desc = 'buffer 3' })
+vim.keymap.set('n', '<leader>4', function()
+  require('bufferline').go_to_buffer(4)
+end, { desc = 'buffer 4' })
+vim.keymap.set('n', '<leader>5', function()
+  require('bufferline').go_to_buffer(5)
+end, { desc = 'buffer 5' })
+vim.keymap.set('n', '<leader>6', function()
+  require('bufferline').go_to_buffer(6)
+end, { desc = 'buffer 6' })
+vim.keymap.set('n', '<leader>7', function()
+  require('bufferline').go_to_buffer(7)
+end, { desc = 'buffer 7' })
+vim.keymap.set('n', '<leader>8', function()
+  require('bufferline').go_to_buffer(8)
+end, { desc = 'buffer 8' })
+vim.keymap.set('n', '<leader>9', function()
+  require('bufferline').go_to_buffer(9)
+end, { desc = 'buffer 9' })
+
 vim.keymap.set('n', '<leader>bb', '<cmd>buffers<cr>:buffer<space>', { desc = '[B]uffer [B]y number' })
-vim.keymap.set('n', '<Tab>', '<cmd>BufferNext<cr>', { desc = 'Next buffer' })
-vim.keymap.set('n', '<S-Tab>', '<cmd>BufferPrevious<cr>', { desc = 'Prev buffer' })
+vim.keymap.set('n', '<Tab>', '<cmd>BufferLineCycleNext<cr>', { desc = 'Next buffer' })
+vim.keymap.set('n', '<S-Tab>', '<cmd>BufferLineCyclePrev<cr>', { desc = 'Prev buffer' })
 vim.keymap.set('n', '<leader>bo', '<cmd>%bd|e#|bd#<cr>', { desc = '[B]uffer [O]nly (close others)' })
-vim.keymap.set('n', '<C-c>', '<cmd>BufferClose<cr>', { desc = 'Close Current Buffer' })
+vim.keymap.set('n', '<C-c>', '<cmd>BufferLinePickClose<cr>', { desc = 'Close Current Buffer' })
 vim.keymap.set('n', '<leader>e', '<cmd>NvimTreeFocus<CR>', { desc = 'focus Neo-tree' })
 vim.keymap.set('n', '<C-n>', '<cmd>NvimTreeToggle<CR>', { desc = 'nvimtree toggle window' })
 vim.keymap.set('n', '<leader>ft', '<cmd>TodoTelescope<CR>', { desc = 'Find Todo' })
@@ -47,18 +66,14 @@ vim.g.loaded_netrwPlugin = 1
 --   return false
 -- end
 --
--- vim.api.nvim_create_autocmd('BufEnter', {
---   nested = true,
---   callback = function()
---     if
---       #vim.api.nvim_list_wins() == 1
---       and vim.api.nvim_buf_get_name(0):match 'NvimTree_' ~= nil
---       and is_modified_buffer_open(vim.fn.getbufinfo { bufmodified = 1 }) == false
---     then
---       vim.cmd 'quit'
---     end
---   end,
--- })
+vim.api.nvim_create_autocmd('BufEnter', {
+  nested = true,
+  callback = function()
+    if #vim.api.nvim_list_wins() == 1 and vim.bo.filetype == 'NvimTree' then
+      vim.cmd 'quit'
+    end
+  end,
+})
 
 --resize
 vim.api.nvim_create_autocmd('VimResized', {
@@ -107,6 +122,11 @@ vim.keymap.set('n', 'k', 'gk', { silent = true })
 vim.keymap.set('n', '<CR>', ':nohlsearch<CR><CR>')
 vim.keymap.set('n', '<leader>h', ':silent! !tmux popup -d "#{pane_current_path}" -xC -yC -w80\\% -h80\\% -E >/dev/null 2>&1<CR>')
 vim.keymap.set('n', '<leader>v', ':silent! !tmux split-window -v -p 20 >/dev/null 2>&1<CR>')
+-- vim.keymap.set('n', '<leader>v', function()
+--   local cwd = vim.fn.expand '%:p:h'
+--   vim.cmd('silent !tmux split-window -v -p 20 -c "' .. cwd .. '"')
+-- end, { noremap = true, silent = true })
+
 vim.keymap.set('n', '<leader>y', ':silent! !tmux split-window -h -p 40 "yazi ." >/dev/null 2>&1<CR>')
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '<C-j>', '<C-d>zz')
@@ -418,8 +438,7 @@ require('lazy').setup({
       },
       view = {
         width = 30,
-        preserve_window_proportions = true,
-        adaptive_size = true,
+        side = 'left',
       },
       renderer = {
         root_folder_label = false,
@@ -510,66 +529,137 @@ require('lazy').setup({
   --   end,
   -- },
   {
-    'romgrk/barbar.nvim',
-    dependencies = {
-      'lewis6991/gitsigns.nvim', -- OPTIONAL: for git status
-    },
-    init = function()
-      vim.g.barbar_auto_setup = false
+    'akinsho/bufferline.nvim',
+    version = '*',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      require('bufferline').setup {
+        options = {
+          mode = 'buffers',
+          themable = true,
+
+          numbers = 'none',
+          auto_close = false,
+
+          close_command = 'bdelete! %d',
+          right_mouse_command = 'bdelete! %d',
+          left_mouse_command = 'buffer %d',
+
+          indicator = {
+            icon = '▎',
+            style = 'icon',
+          },
+
+          buffer_close_icon = '󰅖',
+          modified_icon = '● ',
+          close_icon = ' ',
+          left_trunc_marker = ' ',
+          right_trunc_marker = ' ',
+
+          max_name_length = 18,
+          max_prefix_length = 15,
+          truncate_names = true,
+          tab_size = 18,
+
+          diagnostics = 'nvim_lsp',
+          diagnostics_update_on_event = true,
+
+          diagnostics_indicator = function(count)
+            return '(' .. count .. ')'
+          end,
+
+          offsets = {
+            {
+              filetype = 'NvimTree',
+              text = 'File Explorer',
+              text_align = 'left',
+              separator = true,
+            },
+          },
+
+          color_icons = true,
+          show_buffer_icons = true,
+          show_buffer_close_icons = true,
+          show_close_icon = true,
+          show_tab_indicators = true,
+
+          persist_buffer_sort = true,
+          move_wraps_at_ends = false,
+
+          separator_style = 'slant',
+
+          always_show_bufferline = true,
+          auto_toggle_bufferline = true,
+
+          hover = {
+            enabled = true,
+            delay = 200,
+            reveal = { 'close' },
+          },
+
+          sort_by = 'insert_after_current',
+        },
+      }
     end,
-    opts = {
-      highlight_inactive_file_icons = true,
-      hide = { extensions = false, inactive = false },
-      focus_on_close = 'left',
-      maximum_length = 9,
-
-      icons = {
-        -- Configure the base icons on the bufferline.
-        -- Valid options to display the buffer index and -number are `true`, 'superscript' and 'subscript'
-        buffer_index = true,
-        buffer_number = false,
-
-        button = '',
-        -- Enables / disables diagnostic symbols
-        diagnostics = {
-          [vim.diagnostic.severity.ERROR] = { enabled = true, icon = 'ﬀ' },
-          [vim.diagnostic.severity.WARN] = { enabled = false },
-          [vim.diagnostic.severity.INFO] = { enabled = false },
-          [vim.diagnostic.severity.HINT] = { enabled = true },
-        },
-        gitsigns = {
-          added = { enabled = true, icon = '+' },
-          changed = { enabled = true, icon = '~' },
-          deleted = { enabled = true, icon = '-' },
-        },
-        filetype = {
-          -- Sets the icon's highlight group.
-          -- If false, will use nvim-web-devicons colors
-          custom_colors = false,
-
-          -- Requires `nvim-web-devicons` if `true`
-          enabled = false,
-        },
-
-        -- Use a preconfigured buffer appearance— can be 'default', 'powerline', or 'slanted'
-        preset = 'default',
-        maximum_length = 25,
-
-        -- Configure the icons on the bufferline based on the visibility of a buffer.
-        -- Supports all the base icon options, plus `modified` and `pinned`.
-        alternate = { filetype = { enabled = false } },
-        current = { buffer_index = true },
-        inactive = { button = '×', buffer_index = true },
-        visible = { modified = { buffer_number = false } },
-      },
-      auto_hide = true,
-      -- lazy.nvim will automatically call setup for you. put your options here, anything missing will use the default:
-      animation = false,
-      -- insert_at_start = true,
-      -- …etc.
-    },
-    version = '^1.0.0', -- optional: only update when a new 1.x version is released
   },
+  -- {
+  --   'romgrk/barbar.nvim',
+  --   init = function()
+  --     vim.g.barbar_auto_setup = false
+  --   end,
+  --   opts = {
+  --     highlight_inactive_file_icons = true,
+  --     hide = { extensions = false, inactive = false },
+  --     focus_on_close = 'left',
+  --     maximum_length = 9,
+  --
+  --     icons = {
+  --       -- Configure the base icons on the bufferline.
+  --       -- Valid options to display the buffer index and -number are `true`, 'superscript' and 'subscript'
+  --       buffer_index = true,
+  --       buffer_number = false,
+  --
+  --       button = '',
+  --       -- Enables / disables diagnostic symbols
+  --       diagnostics = {
+  --         [vim.diagnostic.severity.ERROR] = { enabled = true, icon = 'ﬀ' },
+  --         [vim.diagnostic.severity.WARN] = { enabled = false },
+  --         [vim.diagnostic.severity.INFO] = { enabled = false },
+  --         [vim.diagnostic.severity.HINT] = { enabled = true },
+  --       },
+  --       gitsigns = {
+  --         added = { enabled = true, icon = '+' },
+  --         changed = { enabled = true, icon = '~' },
+  --         deleted = { enabled = true, icon = '-' },
+  --       },
+  --       filetype = {
+  --         -- Sets the icon's highlight group.
+  --         -- If false, will use nvim-web-devicons colors
+  --         custom_colors = false,
+  --
+  --         -- Requires `nvim-web-devicons` if `true`
+  --         enabled = false,
+  --       },
+  --
+  --       -- Use a preconfigured buffer appearance— can be 'default', 'powerline', or 'slanted'
+  --       preset = 'default',
+  --       maximum_length = 25,
+  --
+  --       -- Configure the icons on the bufferline based on the visibility of a buffer.
+  --       -- Supports all the base icon options, plus `modified` and `pinned`.
+  --       alternate = { filetype = { enabled = false } },
+  --       current = { buffer_index = true },
+  --       inactive = { button = '×', buffer_index = true },
+  --       visible = { modified = { buffer_number = false } },
+  --     },
+  --     auto_hide = true,
+  --     -- lazy.nvim will automatically call setup for you. put your options here, anything missing will use the default:
+  --     animation = false,
+  --     -- insert_at_start = true,
+  --     -- …etc.
+  --   },
+  --   version = '^1.0.0', -- optional: only update when a new 1.x version is released
+  -- },
   {
     'lewis6991/gitsigns.nvim',
     ft = { 'gitcommit', 'diff' },
@@ -596,11 +686,11 @@ require('lazy').setup({
         topdelete = { text = '‾' },
         changedelete = { text = '~' },
       },
-      current_line_blame = false,
+      current_line_blame = true,
       current_line_blame_opts = {
         virt_text = true,
         virt_text_pos = 'eol',
-        delay = 1000,
+        delay = 500,
         ignore_whitespace = false,
         virt_text_priority = 100,
         use_focus = true,
@@ -844,7 +934,9 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
-      vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
+      vim.keymap.set('n', '<leader>ss.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
+      vim.keymap.set('n', '<leader>gc', builtin.git_commits, { desc = 'Git Commits' })
+      vim.keymap.set('n', '<leader>gfc', builtin.git_bcommits, { desc = 'Git File Commits' })
 
       vim.keymap.set('n', '<leader>/', builtin.live_grep, { desc = 'Search all files' })
       vim.keymap.set('n', '<leader>f', builtin.find_files, { desc = 'Search files' })
@@ -1072,13 +1164,6 @@ require('lazy').setup({
       vim.notify = function(msg, log_level, opts)
         if opts and opts.client_id then
           local client = vim.lsp.get_client_by_id(opts.client_id)
-          if client and client.name == 'rust_analyzer' or 'rust-analyzer' then
-            return
-          end
-        end
-
-        if opts and opts.client_name == 'rust_analyzer' or 'rust-analyzer' then
-          return
         end
 
         orig_notify(msg, log_level, opts)
@@ -1344,111 +1429,6 @@ require('lazy').setup({
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
-  -- {
-  --   'phha/zenburn.nvim',
-  --   config = function()
-  --     require('zenburn').setup()
-  --   end,
-  -- },
-
-  -- {
-  --
-  --   -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-  --   'rose-pine/neovim',
-  --   priority = 1000,
-  --   name = 'rose-pine',
-  -- },
-  -- {
-  --   'folke/tokyonight.nvim',
-  --   lazy = false,
-  --
-  --   priority = 1000,
-  --
-  --   config = function()
-  --     -- require('tokyonight').setup {
-  --     --   style = 'night',
-  --     --   transparent = true,
-  --     --   styles = {
-  --     --     sidebars = 'transparent',
-  --     --     floats = 'transparent',
-  --     --   },
-  --     -- }
-  --     -- vim.cmd.colorscheme 'tokyonight-night'
-  --   end,
-  -- },
-  -- {
-  --   'sainnhe/gruvbox-material',
-  --   priority = 1000, -- Ensure Gruvbox Material loads first (if necessary)
-  --   config = function()
-  --     -- Gruvbox Material settings
-  --     vim.o.background = 'dark' -- Set background to dark. Can be "dark" or "light".
-  --     vim.g.gruvbox_material_background = 'soft' -- Options: "soft", "medium", "hard"
-  --     vim.g.gruvbox_material_palette = 'mix' -- Options: "material", "mix", "original"
-  --     vim.g.gruvbox_material_enable_italic = false -- Enable italic comments, etc.
-  --     vim.g.gruvbox_material_better_performance = 1 -- Optimize performance for large files
-  --
-  --     vim.g.gruvbox_material_transparent_background = 2
-  --
-  --     -- Load Gruvbox Material as the colorscheme
-  --     vim.cmd 'colorscheme gruvbox-material'
-  --   end,
-  -- },
-  -- {
-  --   'rebelot/kanagawa.nvim',
-  --   priority = 1000,
-  --   init = function()
-  --     vim.cmd.colorscheme 'kanagawa-dragon'
-  --     -- vim.cmd.hi 'Comment gui=none'
-  --     -- vim.cmd [[highlight! link CmpPmenu KanagawaPmenu]]
-  --     -- vim.cmd [[highlight! link CmpPmenuSel KanagawaPmenuSel]]
-  --     -- vim.cmd [[highlight! link CmpPmenuThumb KanagawaPmenuThumb]]
-  --     -- vim.cmd [[highlight! link CmpDocumentation KanagawaDocumentation]]
-  --     -- vim.cmd [[highlight! link CmpDocumentationBorder KanagawaDocumentationBorder]]
-  --   end,
-  -- },
-  -- {
-  --   'rose-pine/neovim',
-  --   priority = 1000,
-  --   config = function()
-  --     ---@diagnostic disable-next-line: missing-fields
-  --     require('rose-pine').setup {
-  --       -- Disable italics
-  --       styles = {
-  --         bold = true,
-  --         italic = false,
-  --         keywords = { italic = false },
-  --         functions = { italic = false },
-  --         conditionals = { italic = false },
-  --         loops = { italic = false },
-  --         variables = { italic = false },
-  --         comments = { italic = false },
-  --       },
-  --       -- Make background transparent/disabled
-  --       disable_background = true,
-  --     }
-  --
-  --     -- Load the colorscheme
-  --     -- vim.cmd.colorscheme 'rose-pine'
-  --
-  --     -- Set background to pure black for general UI
-  --     vim.cmd [[highlight Normal guibg=#000000]]
-  --     vim.cmd [[highlight NormalFloat guibg=#000000]]
-  --     vim.cmd [[highlight NormalNC guibg=#000000]]
-  --
-  --     -- Set Telescope elements to have black background
-  --     vim.cmd [[highlight TelescopeNormal guibg=#000000]]
-  --     vim.cmd [[highlight TelescopePrompt guibg=#000000]]
-  --     vim.cmd [[highlight TelescopeResults guibg=#000000]]
-  --     -- vim.cmd [[highlight TelescopePromptBorder guibg=#000000 guifg=#000000]]
-  --     -- vim.cmd [[highlight TelescopeResultsBorder guibg=#000000 guifg=#000000]]
-  --     -- vim.cmd [[highlight TelescopePreviewBorder guibg=#000000 guifg=#000000]]
-  --     -- vim.cmd [[highlight TelescopePreviewTitle guibg=#000000]]
-  --     -- vim.cmd [[highlight TelescopePromptTitle guibg=#000000]]
-  --     -- vim.cmd [[highlight TelescopeResultsTitle guibg=#000000]]
-  --     -- vim.cmd [[highlight TelescopeSelection guibg=#101010]] -- Slightly lighter for selection
-  --     -- vim.cmd [[highlight TelescopePreviewNormal guibg=#000000]]
-  --   end,
-  -- },
 
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
@@ -1459,6 +1439,7 @@ require('lazy').setup({
       --  - va)  - [V]isually select [A]round [)]paren
       --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
       --  - ci'  - [C]hange [I]nside [']quote
+      --  vi' - Select around
       require('mini.ai').setup { n_lines = 500 }
 
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
