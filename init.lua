@@ -49,7 +49,6 @@ vim.keymap.set('n', '<C-c>', '<cmd>BufferLinePickClose<cr>', { desc = 'Close Cur
 vim.keymap.set('n', '<leader>e', '<cmd>NvimTreeFocus<CR>', { desc = 'focus Neo-tree' })
 vim.keymap.set('n', '<C-n>', '<cmd>NvimTreeToggle<CR>', { desc = 'nvimtree toggle window' })
 vim.keymap.set('n', '<leader>ft', '<cmd>TodoTelescope<CR>', { desc = 'Find Todo' })
-
 vim.g.maplocalleader = ' '
 vim.o.winborder = 'rounded'
 vim.g.loaded_netrw = 1
@@ -384,7 +383,34 @@ require('lazy').setup({
       },
     },
   },
-
+  {
+    'MagicDuck/grug-far.nvim',
+    -- Note (lazy loading): grug-far.lua defers all it's requires so it's lazy by default
+    -- additional lazy config to defer loading is not really needed...
+    event = 'VeryLazy',
+    keys = {
+      {
+        '<leader>Sr',
+        "<cmd>lua require('grug-far').toggle_instance({ instanceName='far', staticTitle='Search and Replace' })<CR>",
+        mode = { 'n', 'o', 'x' },
+      },
+      {
+        '<leader>sr',
+        function()
+          require('grug-far').open { prefills = { paths = vim.fn.expand '%' } }
+        end,
+        desc = 'Find and Replace word in current file.',
+      },
+    },
+    config = function()
+      -- optional setup call to override plugin options
+      -- alternatively you can set options with vim.g.grug_far = { ... }
+      require('grug-far').setup {
+        -- options, see Configuration section below
+        -- there are no required options atm
+      }
+    end,
+  },
   {
     'isakbm/gitgraph.nvim',
     opts = {
