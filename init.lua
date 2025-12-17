@@ -40,7 +40,6 @@ end, { desc = 'buffer 8' })
 vim.keymap.set('n', '<leader>9', function()
   require('bufferline').go_to_buffer(9)
 end, { desc = 'buffer 9' })
-
 vim.keymap.set('n', '<leader>bb', '<cmd>buffers<cr>:buffer<space>', { desc = '[B]uffer [B]y number' })
 vim.keymap.set('n', '<Tab>', '<cmd>BufferLineCycleNext<cr>', { desc = 'Next buffer' })
 vim.keymap.set('n', '<S-Tab>', '<cmd>BufferLineCyclePrev<cr>', { desc = 'Prev buffer' })
@@ -554,6 +553,18 @@ require('lazy').setup({
   --     require('neo-tree').setup(opts)
   --   end,
   -- },
+  {
+    'OXY2DEV/markview.nvim',
+    lazy = false,
+    config = function()
+      require('markview').setup {
+        preview = { enable = false },
+      }
+
+      vim.keymap.set('n', '<leader>m', '<CMD>Markview<CR>', { desc = 'Toggles `markview` previews globally.' })
+    end,
+    dependencies = { 'saghen/blink.cmp' },
+  },
   {
     'akinsho/bufferline.nvim',
     version = '*',
