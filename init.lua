@@ -488,83 +488,27 @@ require('lazy').setup({
   },
 
   -- {
-  --   'nvim-neo-tree/neo-tree.nvim',
-  --   version = 'v3.x',
-  --   dependencies = {
-  --     'nvim-lua/plenary.nvim',
-  --     'nvim-tree/nvim-web-devicons',
-  --     'MunifTanjim/nui.nvim',
-  --     's1n7ax/nvim-window-picker',
-  --   },
-  --   cmd = 'Neotree',
-  --   keys = {
-  --     { '<leader>e', '<cmd>Neotree toggle<CR>', desc = 'Toggle Neo-tree' },
-  --   },
-  --   opts = {
-  --     action = 'show',
-  --     hijack_netrw_behavior = 'disabled',
+  --   'OXY2DEV/markview.nvim',
+  --   lazy = false,
+  --   config = function()
+  --     require('markview').setup {
+  --       preview = { enable = false },
+  --     }
   --
-  --     auto_close = true,
-  --     show = true,
-  --     popup_border_style = 'NC',
-  --     close_if_last_window = true,
-  --     sources = { 'filesystem', 'buffers', 'git_status' },
-  --     window = {
-  --       action = 'show',
-  --       position = 'left',
-  --       width = 30,
-  --       mapping_options = {
-  --         noremap = true,
-  --         nowait = true,
-  --       },
-  --       mappings = {
-  --         ['<cr>'] = 'open', -- Enter:open to edit
-  --         ['<esc>'] = 'revert_preview', -- Esc: clsoe preview
-  --         ['P'] = { 'toggle_preview', nowait = false }, -- P: preview
-  --         ['r'] = 'rename',
-  --         ['d'] = 'delete',
-  --         ['m'] = 'move',
-  --         ['c'] = 'copy_to_clipboard', -- c: copy
-  --         ['|'] = 'split_with_window_picker', -- |: horizontal split
-  --         ['\\'] = 'vsplit_with_window_picker', -- \: vertical split
-  --       },
-  --     },
-  --     filesystem = {
-  --       window = { mappings = { ['.'] = 'set_root' } },
-  --       follow_current_file = { enabled = true },
-  --       use_libuv_file_watcher = true,
-  --       action = 'show',
-  --       filtered_items = {
-  --         visible = true,
-  --         hide_dotfiles = false,
-  --         hide_gitignored = true,
-  --       },
-  --       use_libuv_file_watcher = true,
-  --     },
-  --     buffers = {
-  --       follow_current_file = { enabled = true },
-  --       group_empty_dirs = true,
-  --     },
-  --     git_status = {
-  --       window = { position = 'float' },
-  --     },
-  --   },
-  --   config = function(_, opts)
-  --     require('neo-tree').setup(opts)
+  --     vim.keymap.set('n', '<leader>m', '<CMD>Markview<CR>', { desc = 'Toggles `markview` previews globally.' })
   --   end,
+  --   dependencies = { 'saghen/blink.cmp' },
   -- },
-  {
-    'OXY2DEV/markview.nvim',
-    lazy = false,
-    config = function()
-      require('markview').setup {
-        preview = { enable = false },
-      }
 
-      vim.keymap.set('n', '<leader>m', '<CMD>Markview<CR>', { desc = 'Toggles `markview` previews globally.' })
-    end,
-    dependencies = { 'saghen/blink.cmp' },
-  },
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' },            -- if you use the mini.nvim suite
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' },        -- if you use standalone mini plugins
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
+},
   {
     'akinsho/bufferline.nvim',
     version = '*',
@@ -1175,6 +1119,7 @@ require('lazy').setup({
             },
           },
         },
+        marksman = {},
         dockerls = {
           cmd = { 'docker-langserver', '--stdio' },
         },
