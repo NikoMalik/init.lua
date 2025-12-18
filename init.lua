@@ -502,13 +502,13 @@ require('lazy').setup({
 
   {
     'MeanderingProgrammer/render-markdown.nvim',
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' },            -- if you use the mini.nvim suite
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' },        -- if you use standalone mini plugins
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' }, -- if you use the mini.nvim suite
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' }, -- if you use standalone mini plugins
     dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
     ---@module 'render-markdown'
     ---@type render.md.UserConfig
     opts = {},
-},
+  },
   {
     'akinsho/bufferline.nvim',
     version = '*',
@@ -1146,6 +1146,12 @@ require('lazy').setup({
       vim.notify = function(msg, log_level, opts)
         if opts and opts.client_id then
           local client = vim.lsp.get_client_by_id(opts.client_id)
+          if client and client.name == 'rust_analyzer' or 'rust-analyzer' then
+            return
+          end
+        end
+        if opts and opts.client_name == 'rust_analyzer' or 'rust-analyzer' then
+          return
         end
 
         orig_notify(msg, log_level, opts)
