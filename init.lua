@@ -115,8 +115,6 @@ vim.keymap.set('n', '<C-l>', '<C-w>l')
 vim.keymap.set('n', '<C-j>', '<C-w>j')
 vim.keymap.set('n', '<C-k>', '<C-w>k')
 vim.keymap.set('n', ';', ':')
-vim.keymap.set('n', 'j', 'gj', { silent = true })
-vim.keymap.set('n', 'k', 'gk', { silent = true })
 vim.keymap.set('n', '<CR>', ':nohlsearch<CR><CR>')
 vim.keymap.set('n', '<leader>h', ':silent! !tmux popup -d "#{pane_current_path}" -xC -yC -w80\\% -h80\\% -E >/dev/null 2>&1<CR>')
 vim.keymap.set('n', '<leader>v', ':silent! !tmux split-window -v -p 20 >/dev/null 2>&1<CR>')
@@ -261,14 +259,18 @@ vim.o.smartcase = true
 vim.o.signcolumn = 'yes'
 
 -- Decrease update time
-vim.o.updatetime = 250
+vim.o.updatetime = 300
 
 -- Decrease mapped sequence wait time
-vim.o.timeoutlen = 300
+vim.o.timeoutlen = 500
+
+vim.o.timeout = true
 
 -- Configure how new splits should be opened
 vim.o.splitright = true
 vim.o.splitbelow = true
+
+vim.o.ttimeoutlen = 10
 
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
@@ -293,7 +295,7 @@ vim.o.tabstop = 4
 vim.o.ttyfast = true
 vim.o.softtabstop = 4
 vim.o.shiftwidth = 4
-vim.o.lazyredraw = false
+vim.o.lazyredraw = true
 vim.o.expandtab = false
 vim.o.autoindent = true
 vim.o.smartindent = true
@@ -301,6 +303,12 @@ vim.o.breakindent = true
 vim.o.hlsearch = false
 vim.o.incsearch = true
 vim.o.confirm = false
+vim.o.jumpoptions = 'stack'
+vim.o.autoread = true
+vim.o.swapfile = false
+vim.o.showmode = false
+vim.o.shada = '\'50,<1000,s100,"1000,!'
+vim.o.shadafile = vim.fn.stdpath 'state' .. '/shada/main.shada'
 local signs = { Error = ' ', Warn = ' ', Hint = ' ', Info = ' ' }
 for type, icon in pairs(signs) do
   local hl = 'DiagnosticSign' .. type
