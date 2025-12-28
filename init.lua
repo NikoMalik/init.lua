@@ -1,5 +1,7 @@
 vim.g.loaded_gzip = 1
 vim.g.loaded_tar = 1
+vim.g.loaded_matchparen = 1
+
 vim.g.loaded_tarPlugin = 1
 vim.g.loaded_zip = 1
 vim.g.loaded_zipPlugin = 1
@@ -50,8 +52,8 @@ vim.keymap.set('n', '<C-n>', '<cmd>NvimTreeToggle<CR>', { desc = 'nvimtree toggl
 vim.keymap.set('n', '<leader>ft', '<cmd>TodoTelescope<CR>', { desc = 'Find Todo' })
 vim.g.maplocalleader = ' '
 vim.o.winborder = 'rounded'
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
+vim.g.syntax = 'off'
+vim.o.encoding = 'utf-8'
 -- vim.o.autocomplete = true
 
 -- -- auto close
@@ -81,24 +83,6 @@ vim.api.nvim_create_autocmd('VimResized', {
     vim.cmd 'tabdo wincmd ='
     vim.cmd('tabnext ' .. current_tab)
   end,
-})
-
-local max_buffers = 9
-
-local function trim_buffers()
-  local buffers = vim.fn.getbufinfo { buflisted = 1 }
-  if #buffers > max_buffers then
-    for i = 1, #buffers - max_buffers do
-      local buf = buffers[i]
-      if vim.api.nvim_buf_get_option(buf.bufnr, 'modified') == false then
-        vim.cmd('bwipeout ' .. buf.bufnr)
-      end
-    end
-  end
-end
-
-vim.api.nvim_create_autocmd('BufAdd', {
-  callback = trim_buffers,
 })
 
 vim.keymap.set('n', '<C-j>', ':m .+1<CR>==')
@@ -264,13 +248,9 @@ vim.o.updatetime = 300
 -- Decrease mapped sequence wait time
 vim.o.timeoutlen = 500
 
-vim.o.timeout = true
-
 -- Configure how new splits should be opened
 vim.o.splitright = true
 vim.o.splitbelow = true
-
-vim.o.ttimeoutlen = 10
 
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
@@ -295,7 +275,7 @@ vim.o.tabstop = 4
 vim.o.ttyfast = true
 vim.o.softtabstop = 4
 vim.o.shiftwidth = 4
-vim.o.lazyredraw = true
+vim.o.lazyredraw = false
 vim.o.expandtab = false
 vim.o.autoindent = true
 vim.o.smartindent = true
@@ -349,9 +329,6 @@ rtp:prepend(lazypath)
 require('lazy').setup({
   defaults = { lazy = true },
   performance = {
-    cache = {
-      enabled = true,
-    },
     rtp = {
       disabled_plugins = {
         '2html_plugin',
@@ -1298,99 +1275,6 @@ require('lazy').setup({
       signature = { enabled = true },
     },
   },
-  {
-    'pteroctopus/faster.nvim',
-    opts = {
-      -- Behaviour table contains configuration for behaviours faster.nvim uses
-      behaviours = {
-        -- Fast macro configuration controls disabling and enabling features when
-        -- macro is executed
-        fastmacro = {
-          -- Behaviour can be turned on or off. To turn on set to true, otherwise
-          -- set to false
-          on = true,
-          -- Table which contains names of features that will be disabled when
-          -- macro is executed. Feature names can be seen in features table below.
-          -- features_disabled can also be set to "all" and then all features that
-          -- are on (on=true) are going to be disabled for this behaviour.
-          -- Specificaly:
-          -- * lualine plugin is disabled when macros are executed because
-          -- if a recursive macro opens a buffer on every iteration this error will
-          -- happen after 300-400 hundred iterations:
-          -- `E5108: Error executing lua Vim:E903: Process failed to start: too many open files: "/usr/bin/git"`
-          -- * mini.clue plugin is disabled when macros are executed because it breaks execution of some macros
-          features_disabled = { 'lualine', 'mini_clue' },
-        },
-      },
-      -- Feature table contains configuration for features faster.nvim will disable
-      -- and enable according to rules defined in behaviours.
-      -- Defined feature will be used by faster.nvim only if it is on (`on=true`).
-      -- Defer will be used if some features need to be disabled after others.
-      -- defer=false features will be disabled first and defer=true features last.
-      features = {
-        -- Neovim filetype plugin
-        -- https://neovim.io/doc/user/filetype.html
-        filetype = {
-          on = true,
-          defer = true,
-        },
-        -- Illuminate plugin
-        -- https://github.com/RRethy/vim-illuminate
-        illuminate = {
-          on = true,
-          defer = false,
-        },
-        -- Indent Blankline
-        -- https://github.com/lukas-reineke/indent-blankline.nvim
-        indent_blankline = {
-          on = true,
-          defer = false,
-        },
-        -- Neovim LSP
-        -- https://neovim.io/doc/user/lsp.html
-        lsp = {
-          on = true,
-          defer = false,
-        },
-        -- Lualine
-        -- https://github.com/nvim-lualine/lualine.nvim
-        lualine = {
-          on = true,
-          defer = false,
-        },
-        -- Neovim Pi_paren plugin
-        -- https://neovim.io/doc/user/pi_paren.html
-        matchparen = {
-          on = true,
-          defer = false,
-        },
-        -- Neovim syntax
-        -- https://neovim.io/doc/user/syntax.html
-        syntax = {
-          on = true,
-          defer = true,
-        },
-        -- Neovim treesitter
-        -- https://neovim.io/doc/user/treesitter.html
-        treesitter = {
-          on = true,
-          defer = false,
-        },
-        -- Neovim options that affect speed when big file is opened:
-        -- swapfile, foldmethod, undolevels, undoreload, list
-        vimopts = {
-          on = true,
-          defer = false,
-        },
-        -- Mini.clue
-        -- https://github.com/nvim-mini/mini.clue
-        mini_clue = {
-          on = true,
-          defer = false,
-        },
-      },
-    },
-  },
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
@@ -1471,6 +1355,8 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
+    event = { 'BufReadPost', 'BufNewFile' },
+    cmd = { 'TSInstall', 'TSBufEnable', 'TSBufDisable', 'TSModuleInfo' },
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
@@ -1509,6 +1395,7 @@ require('lazy').setup({
         additional_vim_regex_highlighting = false,
         use_languagetree = true,
       },
+      modules = { 'highlight', 'incremental_selection', 'indent' },
       indent = { enable = true, disable = { 'ruby' } },
     },
   },
@@ -1531,6 +1418,3 @@ require('lazy').setup({
     },
   },
 })
-
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
