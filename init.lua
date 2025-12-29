@@ -1,7 +1,5 @@
 vim.g.loaded_gzip = 1
 vim.g.loaded_tar = 1
-vim.g.loaded_matchparen = 1
-
 vim.g.loaded_tarPlugin = 1
 vim.g.loaded_zip = 1
 vim.g.loaded_zipPlugin = 1
@@ -52,7 +50,7 @@ vim.keymap.set('n', '<C-n>', '<cmd>NvimTreeToggle<CR>', { desc = 'nvimtree toggl
 vim.keymap.set('n', '<leader>ft', '<cmd>TodoTelescope<CR>', { desc = 'Find Todo' })
 vim.g.maplocalleader = ' '
 vim.o.winborder = 'rounded'
-vim.g.syntax = 'off'
+-- vim.g.syntax = 'off'
 vim.o.encoding = 'utf-8'
 -- vim.o.autocomplete = true
 
@@ -232,7 +230,7 @@ end)
 
 -- Save undo history
 vim.o.undofile = true
-vim.o.smoothscroll = false
+vim.o.smoothscroll = true
 vim.o.guicursor = ''
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
@@ -243,7 +241,7 @@ vim.o.smartcase = true
 vim.o.signcolumn = 'yes'
 
 -- Decrease update time
-vim.o.updatetime = 300
+vim.o.updatetime = 50
 
 -- Decrease mapped sequence wait time
 vim.o.timeoutlen = 500
@@ -289,11 +287,14 @@ vim.o.swapfile = false
 vim.o.showmode = false
 vim.o.shada = '\'50,<1000,s100,"1000,!'
 vim.o.shadafile = vim.fn.stdpath 'state' .. '/shada/main.shada'
-local signs = { Error = ' ', Warn = ' ', Hint = ' ', Info = ' ' }
-for type, icon in pairs(signs) do
-  local hl = 'DiagnosticSign' .. type
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-end
+
+-- deprecated
+-- local signs = { Error = ' ', Warn = ' ', Hint = ' ', Info = ' ' }
+-- for type, icon in pairs(signs) do
+--   local hl = 'DiagnosticSign' .. type
+--   vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+-- end
+
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
@@ -352,12 +353,9 @@ require('lazy').setup({
         'zipPlugin',
         'tutor',
         'rplugin',
-        'syntax',
-        'synmenu',
         'optwin',
         'compiler',
         'bugreport',
-        'ftplugin',
         'netrwPlugin',
         'gzip',
         'tarPlugin',
@@ -454,15 +452,15 @@ require('lazy').setup({
   --   dependencies = { 'saghen/blink.cmp' },
   -- },
 
-  {
-    'MeanderingProgrammer/render-markdown.nvim',
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' }, -- if you use the mini.nvim suite
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' }, -- if you use standalone mini plugins
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
-    ---@module 'render-markdown'
-    ---@type render.md.UserConfig
-    opts = {},
-  },
+  -- {
+  --   'MeanderingProgrammer/render-markdown.nvim',
+  --   dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' }, -- if you use the mini.nvim suite
+  --   dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' }, -- if you use standalone mini plugins
+  --   dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+  --   ---@module 'render-markdown'
+  --   ---@type render.md.UserConfig
+  --   opts = {},
+  -- },
   {
     'akinsho/bufferline.nvim',
     version = '*',
@@ -956,14 +954,14 @@ require('lazy').setup({
         severity_sort = true,
         float = { border = 'rounded', source = 'if_many' },
         underline = { severity = vim.diagnostic.severity.ERROR },
-        signs = vim.g.have_nerd_font and {
+        signs = {
           text = {
             [vim.diagnostic.severity.ERROR] = '󰅚 ',
             [vim.diagnostic.severity.WARN] = '󰀪 ',
             [vim.diagnostic.severity.INFO] = '󰋽 ',
             [vim.diagnostic.severity.HINT] = '󰌶 ',
           },
-        } or {},
+        },
         virtual_text = {
           source = 'if_many',
           spacing = 2,
@@ -1354,8 +1352,9 @@ require('lazy').setup({
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    lazy = false,
     build = ':TSUpdate',
-    event = { 'BufReadPost', 'BufNewFile' },
+    branch = 'main',
     cmd = { 'TSInstall', 'TSBufEnable', 'TSBufDisable', 'TSModuleInfo' },
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
