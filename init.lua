@@ -74,6 +74,7 @@ vim.api.nvim_create_autocmd('BufEnter', {
 })
 
 --resize
+vim.g.resize = true
 vim.api.nvim_create_autocmd('VimResized', {
   group = vim.api.nvim_create_augroup('resize_splits', { clear = true }),
   callback = function()
@@ -244,7 +245,7 @@ vim.o.signcolumn = 'yes'
 vim.o.updatetime = 50
 
 -- Decrease mapped sequence wait time
-vim.o.timeoutlen = 500
+vim.o.timeoutlen = 100
 
 -- Configure how new splits should be opened
 vim.o.splitright = true
@@ -273,7 +274,7 @@ vim.o.tabstop = 4
 vim.o.ttyfast = true
 vim.o.softtabstop = 4
 vim.o.shiftwidth = 4
-vim.o.lazyredraw = false
+vim.o.lazyredraw = true
 vim.o.expandtab = false
 vim.o.autoindent = true
 vim.o.smartindent = true
@@ -1317,15 +1318,18 @@ require('lazy').setup({
           active = function()
             local git = statusline.section_git { trunc_width = 75 }
             local fileinfo = statusline.section_fileinfo { trunc_width = 120 }
+            local diff = MiniStatusline.section_diff { trunc_width = 75 }
             local diagnostics = statusline.section_diagnostics { trunc_width = 75 }
             -- local location = statusline.section_location { trunc_width = 140 }
             local filename = statusline.section_filename { trunc_width = 140 }
             -- local filetype = vim.bo.filetype
             return statusline.combine_groups {
-              { hl = 'MiniStatuslineDevinfo', strings = { git, diagnostics } },
+              { hl = 'MiniStatuslineDevinfo', strings = { git, diagnostics, diff } },
               '%<',
               { hl = 'MiniStatuslineFilename', strings = { filename } },
               '%=',
+              { hl = 'MiniStatuslineFileinfo', strings = { '%L' } },
+
               -- { hl = 'MiniStatuslineFileinfo', strings = { fileinfo, filetype } },
               -- { hl = 'MiniStatuslineDevinfo', strings = { location } },
             }
