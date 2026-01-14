@@ -64,6 +64,29 @@ vim.o.encoding = 'utf-8'
 --   return false
 -- end
 --
+--
+--
+--
+--
+
+local function insert_separator()
+  local lines = {
+    '',
+    '',
+    '//------------------------------------------------------------------------------------',
+    '',
+    '',
+    '//------------------------------------------------------------------------------------',
+    '',
+    '',
+  }
+
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  vim.api.nvim_buf_set_lines(0, row, row, false, lines)
+end
+
+vim.api.nvim_create_user_command('Sep', insert_separator, {})
+
 vim.api.nvim_create_autocmd('BufEnter', {
   nested = true,
   callback = function()
@@ -1281,6 +1304,60 @@ require('lazy').setup({
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
+      -- require('mini.files').setup {
+      --   -- Customization of shown content
+      --   content = {
+      --     -- Predicate for which file system entries to show
+      --     filter = nil,
+      --     -- Highlight group to use for a file system entry
+      --     highlight = nil,
+      --     -- Prefix text and highlight to show to the left of file system entry
+      --     prefix = nil,
+      --     -- Order in which to show file system entries
+      --     sort = nil,
+      --   },
+      --
+      --   -- Module mappings created only inside explorer.
+      --   -- Use `''` (empty string) to not create one.
+      --   mappings = {
+      --     close = 'q',
+      --     go_in = 'l',
+      --     go_in_plus = 'L',
+      --     go_out = 'h',
+      --     go_out_plus = 'H',
+      --     mark_goto = "'",
+      --     mark_set = 'm',
+      --     reset = '<BS>',
+      --     reveal_cwd = '@',
+      --     show_help = 'g?',
+      --     synchronize = '=',
+      --     trim_left = '<',
+      --     trim_right = '>',
+      --   },
+      --
+      --   -- General options
+      --   options = {
+      --     -- Whether to delete permanently or move into module-specific trash
+      --     permanent_delete = true,
+      --     -- Whether to use for editing directories
+      --     use_as_default_explorer = true,
+      --   },
+      --
+      --   -- Customization of explorer windows
+      --   windows = {
+      --     -- Maximum number of windows to show side by side
+      --     max_number = math.huge,
+      --     -- Whether to show preview of file/directory under cursor
+      --     preview = false,
+      --     -- Width of focused window
+      --     width_focus = 50,
+      --     -- Width of non-focused window
+      --     width_nofocus = 15,
+      --     -- Width of preview window
+      --     width_preview = 25,
+      --   },
+      -- }
+
       -- Better Around/Inside textobjects
       --
       -- Examples:
