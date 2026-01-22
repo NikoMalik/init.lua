@@ -1,3 +1,5 @@
+--NOTE: leader ll for iwe almost(code action)
+
 vim.g.loaded_gzip = 1
 vim.g.loaded_tar = 1
 vim.g.loaded_tarPlugin = 1
@@ -13,6 +15,8 @@ vim.g.loaded_perl_provider = 0
 vim.g.loaded_ruby_provider = 0
 local orig_notify = vim.notify
 vim.g.mapleader = ' '
+vim.keymap.set('n', '<leader>ll', vim.lsp.buf.code_action)
+
 vim.keymap.set('n', '<leader>1', function()
   require('bufferline').go_to_buffer(1)
 end, { desc = 'buffer 1' })
@@ -124,6 +128,7 @@ vim.keymap.set('n', ';', ':')
 vim.keymap.set('n', '<CR>', ':nohlsearch<CR><CR>')
 vim.keymap.set('n', '<leader>h', ':silent! !tmux popup -d "#{pane_current_path}" -xC -yC -w80\\% -h80\\% -E >/dev/null 2>&1<CR>')
 vim.keymap.set('n', '<leader>v', ':silent! !tmux split-window -v -p 20 >/dev/null 2>&1<CR>')
+
 -- vim.keymap.set('n', '<leader>v', function()
 --   local cwd = vim.fn.expand '%:p:h'
 --   vim.cmd('silent !tmux split-window -v -p 20 -c "' .. cwd .. '"')
@@ -268,7 +273,7 @@ vim.o.signcolumn = 'yes'
 vim.o.updatetime = 50
 
 -- Decrease mapped sequence wait time
-vim.o.timeoutlen = 100
+vim.o.timeoutlen = 300
 
 -- Configure how new splits should be opened
 vim.o.splitright = true
@@ -555,6 +560,49 @@ require('lazy').setup({
           },
 
           sort_by = 'insert_after_current',
+        },
+      }
+    end,
+  },
+  {
+    'iwe-org/iwe.nvim',
+    dependencies = {
+      -- At least one picker recommended (any of these):
+      'nvim-telescope/telescope.nvim',
+      -- 'ibhagwan/fzf-lua',
+      -- 'folke/snacks.nvim',
+      -- 'echasnovski/mini.pick',
+    },
+
+    config = function()
+      require('iwe').setup {
+        lsp = {
+          cmd = { 'iwes' },
+          auto_format_on_save = true,
+          enable_inlay_hints = true,
+          debounce_text_changes = 500,
+        },
+        mappings = {
+          enable_markdown_mappings = true, -- Core markdown editing keybindings
+          enable_picker_keybindings = true, -- Set to true to enable gf, gs, ga, g/, gb, gR, go
+          enable_lsp_keybindings = true, -- Set to true to enable IWE-specific LSP keybindings
+          enable_preview_keybindings = true, -- Set to true to enable preview keybindings
+          leader = '<leader>',
+          localleader = '<localleader>',
+        },
+        picker = {
+          backend = 'telescope', -- "auto", "telescope", "fzf_lua", "snacks", "mini", "vim_ui"
+          fallback_notify = true,
+        },
+        telescope = {
+          enabled = true,
+          setup_config = true,
+          load_extensions = { 'ui-select', 'emoji' },
+        },
+        preview = {
+          output_dir = '~/tmp/preview',
+          temp_dir = '/tmp',
+          auto_open = false,
         },
       }
     end,
