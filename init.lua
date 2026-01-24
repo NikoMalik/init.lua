@@ -467,13 +467,20 @@ require('lazy').setup({
       },
     },
   },
+  {
+    'yousefhadder/markdown-plus.nvim', -- https://github.com/yousefhadder/markdown-plus.nvim/wiki/5.Keymaps
+    ft = 'markdown',
+    opts = {
+      -- Your custom configuration here
+    },
+  },
 
   -- {
   --   'OXY2DEV/markview.nvim',
   --   lazy = false,
   --   config = function()
   --     require('markview').setup {
-  --       preview = { enable = false },
+  --       preview = { enable = true },
   --     }
   --
   --     vim.keymap.set('n', '<leader>m', '<CMD>Markview<CR>', { desc = 'Toggles `markview` previews globally.' })
@@ -481,15 +488,15 @@ require('lazy').setup({
   --   dependencies = { 'saghen/blink.cmp' },
   -- },
 
-  -- {
-  --   'MeanderingProgrammer/render-markdown.nvim',
-  --   dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' }, -- if you use the mini.nvim suite
-  --   dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' }, -- if you use standalone mini plugins
-  --   dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
-  --   ---@module 'render-markdown'
-  --   ---@type render.md.UserConfig
-  --   opts = {},
-  -- },
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' }, -- if you use the mini.nvim suite
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' }, -- if you use standalone mini plugins
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
+  },
   {
     'akinsho/bufferline.nvim',
     version = '*',
@@ -564,6 +571,7 @@ require('lazy').setup({
       }
     end,
   },
+
   {
     'iwe-org/iwe.nvim',
     dependencies = {
@@ -1511,7 +1519,7 @@ require('lazy').setup({
         enable = true,
         keymaps = {
           init_selection = 'gnn', -- set to `false` to disable one of the mappings
-          node_incremental = 'grn',
+          node_incremental = 'gbn',
           scope_incremental = 'grc',
           node_decremental = 'grm',
         },
