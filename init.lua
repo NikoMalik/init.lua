@@ -72,6 +72,14 @@ vim.o.encoding = 'utf-8'
 --
 --
 --
+vim.api.nvim_create_autocmd('BufEnter', {
+  nested = true,
+  callback = function()
+    if #vim.api.nvim_list_wins() == 1 and vim.api.nvim_buf_get_name(0):match 'NvimTree_' ~= nil then
+      vim.cmd 'quit'
+    end
+  end,
+})
 
 local function insert_separator()
   local lines = {
@@ -90,15 +98,6 @@ local function insert_separator()
 end
 
 vim.api.nvim_create_user_command('Sep', insert_separator, {})
-
-vim.api.nvim_create_autocmd('BufEnter', {
-  nested = true,
-  callback = function()
-    if #vim.api.nvim_list_wins() == 1 and vim.bo.filetype == 'NvimTree' then
-      vim.cmd 'quit'
-    end
-  end,
-})
 
 --resize
 vim.g.resize = true
@@ -297,7 +296,7 @@ vim.o.inccommand = 'split'
 vim.o.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.o.scrolloff = 5
+vim.o.scrolloff = 10
 vim.o.tabstop = 4
 vim.o.ttyfast = true
 vim.o.softtabstop = 4
@@ -475,28 +474,32 @@ require('lazy').setup({
     },
   },
 
-  -- {
-  --   'OXY2DEV/markview.nvim',
-  --   lazy = false,
-  --   config = function()
-  --     require('markview').setup {
-  --       preview = { enable = true },
-  --     }
-  --
-  --     vim.keymap.set('n', '<leader>m', '<CMD>Markview<CR>', { desc = 'Toggles `markview` previews globally.' })
-  --   end,
-  --   dependencies = { 'saghen/blink.cmp' },
-  -- },
-
   {
-    'MeanderingProgrammer/render-markdown.nvim',
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' }, -- if you use the mini.nvim suite
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' }, -- if you use standalone mini plugins
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
-    ---@module 'render-markdown'
-    ---@type render.md.UserConfig
-    opts = {},
+    'OXY2DEV/markview.nvim',
+    lazy = false,
+    config = function()
+      local presets = require 'markview.presets'
+      require('markview').setup {
+        preview = { enable = true },
+        markdown = {
+          headings = presets.headings.marker,
+        },
+      }
+
+      vim.keymap.set('n', '<leader>m', '<CMD>Markview<CR>', { desc = 'Toggles `markview` previews globally.' })
+    end,
+    dependencies = { 'saghen/blink.cmp' },
   },
+
+  -- {
+  --   'MeanderingProgrammer/render-markdown.nvim',
+  --   dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' }, -- if you use the mini.nvim suite
+  --   dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' }, -- if you use standalone mini plugins
+  --   dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+  --   ---@module 'render-markdown'
+  --   ---@type render.md.UserConfig
+  --   opts = {},
+  -- },
   {
     'akinsho/bufferline.nvim',
     version = '*',
@@ -937,6 +940,7 @@ require('lazy').setup({
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
+
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>f', function()
         builtin.find_files {
@@ -954,6 +958,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>/', builtin.live_grep, { desc = 'Search all files' })
       vim.keymap.set('n', '<leader>f', builtin.find_files, { desc = 'Search files' })
       vim.keymap.set('n', '<leader>d', builtin.diagnostics, { desc = 'Show diagnostics' })
+      vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Buffers' })
 
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
