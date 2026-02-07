@@ -493,32 +493,39 @@ require('lazy').setup({
 		},
 	},
 
-	{
-		'OXY2DEV/markview.nvim',
-		lazy = false,
-		config = function()
-			local presets = require 'markview.presets'
-			require('markview').setup {
-				preview = { enable = true },
-				markdown = {
-					headings = presets.headings.marker,
-				},
-			}
-
-			vim.keymap.set('n', '<leader>m', '<CMD>Markview<CR>', { desc = 'Toggles `markview` previews globally.' })
-		end,
-		dependencies = { 'saghen/blink.cmp' },
-	},
-
 	-- {
-	--   'MeanderingProgrammer/render-markdown.nvim',
-	--   dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' }, -- if you use the mini.nvim suite
-	--   dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' }, -- if you use standalone mini plugins
-	--   dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
-	--   ---@module 'render-markdown'
-	--   ---@type render.md.UserConfig
-	--   opts = {},
+	-- 	'OXY2DEV/markview.nvim',
+	-- 	lazy = false,
+	-- 	config = function()
+	-- 		local presets = require 'markview.presets'
+	-- 		require('markview').setup {
+	-- 			preview = { enable = true },
+	-- 			markdown = {
+	-- 				headings = presets.headings.glow,
+	-- 			},
+	-- 		}
+	--
+	-- 		vim.keymap.set('n', '<leader>m', '<CMD>Markview<CR>', { desc = 'Toggles `markview` previews globally.' })
+	-- 	end,
+	-- 	dependencies = { 'saghen/blink.cmp' },
 	-- },
+
+	{
+		'MeanderingProgrammer/render-markdown.nvim',
+		dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' },   -- if you use the mini.nvim suite
+		dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' },  -- if you use standalone mini plugins
+		dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+		---@module 'render-markdown'
+		---@type render.md.UserConfig
+		opts = {},
+		config = function()
+			require("render-markdown").setup {
+				heading = { position = 'inline' },
+				code = { style = 'normal' },
+				sign = { enabled = false },
+			}
+		end
+	},
 	{
 		'akinsho/bufferline.nvim',
 		version = '*',
@@ -747,7 +754,7 @@ require('lazy').setup({
 		end,
 	},
 
-	{                   -- Useful plugin to show you pending keybinds.
+	{                 -- Useful plugin to show you pending keybinds.
 		'folke/which-key.nvim',
 		event = 'VimEnter', -- Sets the loading event to 'VimEnter'
 		preset = 'helix',

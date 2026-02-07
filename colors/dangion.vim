@@ -67,4 +67,14 @@ highlight Number         guifg=#6f7b68
 highlight Boolean         guifg=#6f7b68
 highlight WinSeparator         guibg=#111111 guifg=#888888
 
+" markdown
+highlight RenderMarkdownCode guibg=#202020 guifg=#FEFEFE
+highlight RenderMarkdownInlineHighlight guifg=#202020 guibg=#A2A970
+highlight RenderMarkdownCodeInline guibg=#303030 guifg=#FEFEFE gui=bold
+
+
+
+
+
+
 highlight @markup.link.label.markdown_inline cterm=NONE
