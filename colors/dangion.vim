@@ -77,7 +77,9 @@ highlight RenderMarkdownLinkTitle guifg=#6f7b68 gui=none
 
 highlight RenderMarkdownWikiLink  guifg=#A2A970 gui=underline gui=bold
 
+highlight RenderMarkdownBold guifg=#FFFEDB guibg=#202020 gui=bold
 
+highlight RenderMarkdownItalic guifg=#A2A970 guibg=#202020 gui=italic
 
 
 
