@@ -71,6 +71,11 @@ highlight WinSeparator         guibg=#111111 guifg=#888888
 highlight RenderMarkdownCode guibg=#202020 guifg=#FEFEFE
 highlight RenderMarkdownInlineHighlight guifg=#202020 guibg=#A2A970
 highlight RenderMarkdownCodeInline guibg=#303030 guifg=#FEFEFE gui=bold
+highlight RenderMarkdownLink      guifg=#A2A970 gui=underline gui=bold
+
+highlight RenderMarkdownLinkTitle guifg=#6f7b68 gui=none
+
+highlight RenderMarkdownWikiLink  guifg=#A2A970 gui=underline gui=bold
 
 
 
