@@ -25,6 +25,16 @@ vim.api.nvim_create_autocmd('FileType', {
 	end,
 })
 
+vim.api.nvim_create_autocmd('FileType', {
+	pattern = { 'text', 'markdown', 'tex', 'typst' },
+	callback = function()
+		vim.opt_local.wrap = false
+		vim.opt_local.linebreak = true
+		vim.opt_local.breakindent = true
+		vim.opt_local.breakindentopt = 'shift:2'
+		vim.opt_local.showbreak = '↳ '
+	end,
+})
 
 
 vim.api.nvim_create_autocmd("LspAttach", {
