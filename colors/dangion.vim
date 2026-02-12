@@ -84,4 +84,5 @@ highlight RenderMarkdownItalic guifg=#A2A970 guibg=#202020 gui=italic
 
 
 
+
 highlight @markup.link.label.markdown_inline cterm=NONE

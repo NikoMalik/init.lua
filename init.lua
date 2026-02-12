@@ -575,7 +575,8 @@ require('lazy').setup({
 			config = function()
 				require("render-markdown").setup {
 					heading = { position = 'inline' },
-					code = { style = 'normal' },
+					-- code = { style = 'normal' },
+					code = { style = 'language' },
 					sign = { enabled = false },
 				}
 			end
