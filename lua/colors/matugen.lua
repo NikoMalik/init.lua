@@ -3,49 +3,71 @@ local M = {}
 function M.setup()
 	require('base16-colorscheme').setup {
 		-- Background tones
-		base00 = '#141317',          -- Default Background
-		base01 = '#211f24', -- Lighter Background (status bars)
-		base02 = '#2b292e', -- Selection Background
-		base03 = '#948e9b',          -- Comments, Invisibles
+		base00 = '#131314',          -- Default Background
+		base01 = '#201f20', -- Lighter Background (status bars)
+		base02 = '#2a2a2a', -- Selection Background
+		base03 = '#8f9195',          -- Comments, Invisibles
 		-- Foreground tones
-		base04 = '#cac4d1', -- Dark Foreground (status bars)
-		base05 = '#e6e1e8',       -- Default Foreground
-		base06 = '#e6e1e8',       -- Light Foreground
-		base07 = '#e6e1e8',    -- Lightest Foreground
+		base04 = '#c5c6cb', -- Dark Foreground (status bars)
+		base05 = '#e5e2e2',       -- Default Foreground
+		base06 = '#e5e2e2',       -- Light Foreground
+		base07 = '#e5e2e2',    -- Lightest Foreground
 		-- Accent colors
 		base08 = '#ffb4ab',            -- Variables, XML Tags, Errors
-		base09 = '#ffaed9',         -- Integers, Constants
-		base0A = '#ccc1e4',        -- Classes, Search Background
-		base0B = '#cfbdff',          -- Strings, Diff Inserted
-		base0C = '#ffaed9', -- Regex, Escape Chars
-		base0D = '#cfbdff', -- Functions, Methods
-		base0E = '#ccc1e4', -- Keywords, Storage
+		base09 = '#d1c2d0',         -- Integers, Constants
+		base0A = '#c5c6cb',        -- Classes, Search Background
+		base0B = '#c0c7d2',          -- Strings, Diff Inserted
+		base0C = '#d1c2d0', -- Regex, Escape Chars
+		base0D = '#c0c7d2', -- Functions, Methods
+		base0E = '#c5c6cb', -- Keywords, Storage
 		base0F = '#93000a',  -- Deprecated, Embedded Tags
 	}
 
 	-- LSP reference highlighting: use background instead of underline
-	vim.api.nvim_set_hl(0, 'LspReferenceText', { bg = '#2b292e' })
-	vim.api.nvim_set_hl(0, 'LspReferenceRead', { bg = '#2b292e' })
-	vim.api.nvim_set_hl(0, 'LspReferenceWrite', { bg = '#363439', bold = true })
+	vim.api.nvim_set_hl(0, 'LspReferenceText', { bg = '#2a2a2a' })
+	vim.api.nvim_set_hl(0, 'LspReferenceRead', { bg = '#2a2a2a' })
+	vim.api.nvim_set_hl(0, 'LspReferenceWrite', { bg = '#353535', bold = true })
 
 	-- Fix punctuation colors (use foreground color instead of red)
-	vim.api.nvim_set_hl(0, 'Delimiter', { fg = '#cac4d1' })
-	vim.api.nvim_set_hl(0, 'Operator', { fg = '#e6e1e8' })
-	vim.api.nvim_set_hl(0, '@punctuation', { fg = '#cac4d1' })
-	vim.api.nvim_set_hl(0, '@punctuation.delimiter', { fg = '#cac4d1' })
-	vim.api.nvim_set_hl(0, '@punctuation.bracket', { fg = '#cac4d1' })
-	vim.api.nvim_set_hl(0, '@punctuation.special', { fg = '#cac4d1' })
+	vim.api.nvim_set_hl(0, 'Delimiter', { fg = '#c5c6cb' })
+	vim.api.nvim_set_hl(0, 'Operator', { fg = '#e5e2e2' })
+	vim.api.nvim_set_hl(0, '@punctuation', { fg = '#c5c6cb' })
+	vim.api.nvim_set_hl(0, '@punctuation.delimiter', { fg = '#c5c6cb' })
+	vim.api.nvim_set_hl(0, '@punctuation.bracket', { fg = '#c5c6cb' })
+	vim.api.nvim_set_hl(0, '@punctuation.special', { fg = '#c5c6cb' })
+
+	-- Fix variable colors (use normal foreground instead of red)
+	vim.api.nvim_set_hl(0, 'Identifier', { fg = '#e5e2e2' })
+	vim.api.nvim_set_hl(0, '@variable', { fg = '#e5e2e2' })
+	vim.api.nvim_set_hl(0, '@variable.builtin', { fg = '#c0c7d2', italic = true })
+	vim.api.nvim_set_hl(0, '@variable.parameter', { fg = '#e5e2e2' })
+	vim.api.nvim_set_hl(0, '@variable.member', { fg = '#e5e2e2' })
+
+	-- Fix namespace/module colors (imports like stdx in Zig)
+	vim.api.nvim_set_hl(0, '@namespace', { fg = '#c0c7d2' })
+	vim.api.nvim_set_hl(0, '@module', { fg = '#c0c7d2' })
+	vim.api.nvim_set_hl(0, 'TSNamespace', { fg = '#c0c7d2' })
+
+	-- Fix type and constant colors (better contrast)
+	vim.api.nvim_set_hl(0, 'Type', { fg = '#c5c6cb' })
+	vim.api.nvim_set_hl(0, '@type', { fg = '#c5c6cb' })
+	vim.api.nvim_set_hl(0, '@type.builtin', { fg = '#c5c6cb', italic = true })
+	vim.api.nvim_set_hl(0, 'TSType', { fg = '#c5c6cb' })
+	vim.api.nvim_set_hl(0, 'Constant', { fg = '#d1c2d0' })
+	vim.api.nvim_set_hl(0, '@constant', { fg = '#d1c2d0' })
+	vim.api.nvim_set_hl(0, '@constant.builtin', { fg = '#d1c2d0', italic = true })
+	vim.api.nvim_set_hl(0, 'TSConstant', { fg = '#d1c2d0' })
 
 	-- LSP diagnostic colors (proper Material Design colors)
 	vim.api.nvim_set_hl(0, 'DiagnosticError', { fg = '#ffb4ab' })
-	vim.api.nvim_set_hl(0, 'DiagnosticWarn', { fg = '#ffaed9' })
-	vim.api.nvim_set_hl(0, 'DiagnosticInfo', { fg = '#cfbdff' })
-	vim.api.nvim_set_hl(0, 'DiagnosticHint', { fg = '#ccc1e4' })
+	vim.api.nvim_set_hl(0, 'DiagnosticWarn', { fg = '#d1c2d0' })
+	vim.api.nvim_set_hl(0, 'DiagnosticInfo', { fg = '#c0c7d2' })
+	vim.api.nvim_set_hl(0, 'DiagnosticHint', { fg = '#c5c6cb' })
 	-- Virtual text
 	vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextError', { fg = '#ffb4ab' })
-	vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextWarn', { fg = '#ffaed9' })
-	vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextInfo', { fg = '#cfbdff' })
-	vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextHint', { fg = '#ccc1e4' })
+	vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextWarn', { fg = '#d1c2d0' })
+	vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextInfo', { fg = '#c0c7d2' })
+	vim.api.nvim_set_hl(0, 'DiagnosticVirtualTextHint', { fg = '#c5c6cb' })
 end
 
 -- Register a signal handler for SIGUSR1 (matugen updates)

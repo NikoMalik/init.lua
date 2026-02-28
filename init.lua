@@ -206,7 +206,7 @@ vim.keymap.set('n', '<leader>jn', ':JournalToday<CR>', { desc = 'Open today’s 
 vim.keymap.set('n', '\\', '<cmd>:vsplit <CR>', { desc = 'Vertical Split' })
 vim.keymap.set('n', '|', ':split<CR>', { desc = 'Horizontal Split' })
 -- vim.cmd.colorscheme 'dosbox' -- super great but a litle bit smoke
--- vim.cmd.colorscheme 'dangion'
+vim.cmd.colorscheme 'dangion'
 
 -- vim.api.nvim_create_autocmd({ 'InsertEnter', 'InsertLeave' }, {
 --   callback = function(event)
@@ -758,14 +758,14 @@ require('lazy').setup({
 				require('gitsigns').setup(opts)
 			end,
 		},
-		{
-			'RRethy/base16-nvim',
-			lazy = false,
-			priority = 1000,
-			config = function()
-				require("colors.matugen").setup()
-			end,
-		},
+		-- {
+		-- 	'RRethy/base16-nvim',
+		-- 	lazy = false,
+		-- 	priority = 1000,
+		-- 	config = function()
+		-- 		require("colors.matugen").setup()
+		-- 	end,
+		-- },
 
 		{              -- Useful plugin to show you pending keybinds.
 			'folke/which-key.nvim',

@@ -48,6 +48,7 @@ highlight Special       guifg=#cccccc
 highlight SpecialChar   guifg=#C1C88D
 highlight SpecialKey    guifg=#676767
 highlight Statement     guifg=#cccccc
+highlight Keyword       guifg=#cccccc gui=NONE
 highlight StatusLine    guifg=#FFFEDB guibg=#34383C
 highlight String        guifg=#A2A970
 highlight Structure     guifg=#AA9AAC
@@ -86,3 +87,11 @@ highlight RenderMarkdownItalic guifg=#A2A970 guibg=#202020 gui=italic
 
 
 highlight @markup.link.label.markdown_inline cterm=NONE
+
+" Treesitter keywords - disable bold
+highlight @keyword guifg=#cccccc gui=NONE
+highlight @keyword.function guifg=#cccccc gui=NONE
+highlight @keyword.return guifg=#cccccc gui=NONE
+highlight @keyword.modifier guifg=#cccccc gui=NONE
+highlight @keyword.repeat guifg=#cccccc gui=NONE
+highlight @keyword.conditional guifg=#cccccc gui=NONE
