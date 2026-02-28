@@ -1,5 +1,5 @@
 --NOTE: leader ll for iwe almost(code action)
-
+vim.opt.rtp:prepend(vim.fn.stdpath('config'))
 vim.g.loaded_gzip = 1
 vim.g.loaded_tar = 1
 vim.g.loaded_tarPlugin = 1
@@ -18,12 +18,21 @@ vim.g.mapleader = ' '
 vim.keymap.set('n', '<leader>ll', vim.lsp.buf.code_action)
 
 
-vim.api.nvim_create_autocmd('FileType', {
-	pattern = 'rust',
-	callback = function()
-		vim.opt_local.colorcolumn = { 100 }
-	end,
-})
+-- vim.api.nvim_create_autocmd('FileType', {
+-- 	pattern = { 'c', 'cpp' },
+-- 	callback = function()
+-- 		vim.opt_local.colorcolumn = { 80 }
+-- 	end,
+-- })
+--
+--
+--
+-- vim.api.nvim_create_autocmd('FileType', {
+-- 	pattern = 'rust',
+-- 	callback = function()
+-- 		vim.opt_local.colorcolumn = { 100 }
+-- 	end,
+-- })
 
 vim.api.nvim_create_autocmd('FileType', {
 	pattern = { 'text', 'markdown', 'tex', 'typst' },
@@ -197,7 +206,7 @@ vim.keymap.set('n', '<leader>jn', ':JournalToday<CR>', { desc = 'Open today’s 
 vim.keymap.set('n', '\\', '<cmd>:vsplit <CR>', { desc = 'Vertical Split' })
 vim.keymap.set('n', '|', ':split<CR>', { desc = 'Horizontal Split' })
 -- vim.cmd.colorscheme 'dosbox' -- super great but a litle bit smoke
-vim.cmd.colorscheme 'dangion'
+-- vim.cmd.colorscheme 'dangion'
 
 -- vim.api.nvim_create_autocmd({ 'InsertEnter', 'InsertLeave' }, {
 --   callback = function(event)
@@ -260,7 +269,8 @@ vim.keymap.set({ 'n', 'v' }, '<leader>rr', function()
 	interactive_replace()
 end, { desc = '[R]eplace [R]eplace String (scope or file)' })
 
-vim.api.nvim_create_user_command('ReplaceString', interactive_replace, { desc = 'Interactive replace' })
+vim.api.nvim_create_user_command('ReplaceString', interactive_replace, {
+	desc = 'Interactive replace' })
 
 vim.keymap.set('n', '<leader>[', function()
 	vim.diagnostic.open_float(nil, { focusable = false })
@@ -336,7 +346,7 @@ vim.o.inccommand = 'split'
 vim.o.cursorline = false
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.o.scrolloff = 5
+vim.o.scrolloff = 10
 vim.o.tabstop = 4
 vim.o.ttyfast = true
 vim.o.softtabstop = 4
@@ -548,21 +558,19 @@ require('lazy').setup({
 		},
 
 		-- {
-		-- 	'OXY2DEV/markview.nvim',
-		-- 	lazy = false,
-		-- 	config = function()
-		-- 		local presets = require 'markview.presets'
-		-- 		require('markview').setup {
-		-- 			preview = { enable = true },
-		-- 			markdown = {
-		-- 				headings = presets.headings.glow,
-		-- 			},
-		-- 		}
-		--
-		-- 		vim.keymap.set('n', '<leader>m', '<CMD>Markview<CR>', { desc = 'Toggles `markview` previews globally.' })
-		-- 	end,
-		-- 	dependencies = { 'saghen/blink.cmp' },
+		-- 	"shortcuts/no-neck-pain.nvim",
+		-- 	version = "*",
+		-- 	opts = {
+		-- 		width = 120,
+		-- 		autocmds = {
+		-- 			enableOnVimEnter = true,
+		-- 		},
+		-- 	},
+		-- 	keys = {
+		-- 		{ "<leader>z", "<cmd>NoNeckPain<cr>", desc = "Toggle No Neck Pain" },
+		-- 	},
 		-- },
+
 
 		{
 			'MeanderingProgrammer/render-markdown.nvim',
@@ -699,64 +707,6 @@ require('lazy').setup({
 				}
 			end,
 		},
-		-- {
-		--   'romgrk/barbar.nvim',
-		--   init = function()
-		--     vim.g.barbar_auto_setup = false
-		--   end,
-		--   opts = {
-		--     highlight_inactive_file_icons = true,
-		--     hide = { extensions = false, inactive = false },
-		--     focus_on_close = 'left',
-		--     maximum_length = 9,
-		--
-		--     icons = {
-		--       -- Configure the base icons on the bufferline.
-		--       -- Valid options to display the buffer index and -number are `true`, 'superscript' and 'subscript'
-		--       buffer_index = true,
-		--       buffer_number = false,
-		--
-		--       button = '',
-		--       -- Enables / disables diagnostic symbols
-		--       diagnostics = {
-		--         [vim.diagnostic.severity.ERROR] = { enabled = true, icon = 'ﬀ' },
-		--         [vim.diagnostic.severity.WARN] = { enabled = false },
-		--         [vim.diagnostic.severity.INFO] = { enabled = false },
-		--         [vim.diagnostic.severity.HINT] = { enabled = true },
-		--       },
-		--       gitsigns = {
-		--         added = { enabled = true, icon = '+' },
-		--         changed = { enabled = true, icon = '~' },
-		--         deleted = { enabled = true, icon = '-' },
-		--       },
-		--       filetype = {
-		--         -- Sets the icon's highlight group.
-		--         -- If false, will use nvim-web-devicons colors
-		--         custom_colors = false,
-		--
-		--         -- Requires `nvim-web-devicons` if `true`
-		--         enabled = false,
-		--       },
-		--
-		--       -- Use a preconfigured buffer appearance— can be 'default', 'powerline', or 'slanted'
-		--       preset = 'default',
-		--       maximum_length = 25,
-		--
-		--       -- Configure the icons on the bufferline based on the visibility of a buffer.
-		--       -- Supports all the base icon options, plus `modified` and `pinned`.
-		--       alternate = { filetype = { enabled = false } },
-		--       current = { buffer_index = true },
-		--       inactive = { button = '×', buffer_index = true },
-		--       visible = { modified = { buffer_number = false } },
-		--     },
-		--     auto_hide = true,
-		--     -- lazy.nvim will automatically call setup for you. put your options here, anything missing will use the default:
-		--     animation = false,
-		--     -- insert_at_start = true,
-		--     -- …etc.
-		--   },
-		--   version = '^1.0.0', -- optional: only update when a new 1.x version is released
-		-- },
 		{
 			'lewis6991/gitsigns.nvim',
 			ft = { 'gitcommit', 'diff' },
@@ -808,6 +758,14 @@ require('lazy').setup({
 				require('gitsigns').setup(opts)
 			end,
 		},
+		{
+			'RRethy/base16-nvim',
+			lazy = false,
+			priority = 1000,
+			config = function()
+				require("colors.matugen").setup()
+			end,
+		},
 
 		{              -- Useful plugin to show you pending keybinds.
 			'folke/which-key.nvim',
@@ -856,106 +814,6 @@ require('lazy').setup({
 			},
 		},
 
-		-- {
-		--   'epwalsh/obsidian.nvim',
-		--   version = '*',
-		--   lazy = true,
-		--   ft = 'markdown',
-		--   dependencies = { 'nvim-lua/plenary.nvim' },
-		--   opts = {
-		--     workspaces = {
-		--       {
-		--         name = 'notes',
-		--         path = '~/notes/',
-		--       },
-		--     },
-		--
-		--     {
-		--       name = 'no-vault',
-		--       path = function()
-		--         -- alternatively use the CWD:
-		--         -- return assert(vim.fn.getcwd())
-		--         return assert(vim.fs.dirname(vim.api.nvim_buf_get_name(0)))
-		--       end,
-		--       overrides = {
-		--         notes_subdir = vim.NIL, -- have to use 'vim.NIL' instead of 'nil'
-		--         new_notes_location = 'current_dir',
-		--         templates = {
-		--           folder = vim.NIL,
-		--         },
-		--         disable_frontmatter = true,
-		--       },
-		--     },
-		--
-		--     ui = {
-		--       enable = true, -- set to false to disable all additional syntax features
-		--       update_debounce = 200, -- update delay after a text change (in milliseconds)
-		--       max_file_length = 5000, -- disable UI features for files with more than this many lines
-		--       -- Define how various check-boxes are displayed
-		--       checkboxes = {
-		--         -- NOTE: the 'char' value has to be a single character, and the highlight groups are defined below.
-		--         [' '] = { char = '󰄱', hl_group = 'ObsidianTodo' },
-		--         ['x'] = { char = '', hl_group = 'ObsidianDone' },
-		--         ['>'] = { char = '', hl_group = 'ObsidianRightArrow' },
-		--         ['~'] = { char = '󰰱', hl_group = 'ObsidianTilde' },
-		--         ['!'] = { char = '', hl_group = 'ObsidianImportant' },
-		--
-		--         -- You can also add more custom ones...
-		--       },
-		--
-		--       -- Use bullet marks for non-checkbox lists.
-		--       bullets = { char = '•', hl_group = 'ObsidianBullet' },
-		--       external_link_icon = { char = '', hl_group = 'ObsidianExtLinkIcon' },
-		--       -- Replace the above with this if you don't have a patched font:
-		--       -- external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" },
-		--       reference_text = { hl_group = 'ObsidianRefText' },
-		--       highlight_text = { hl_group = 'ObsidianHighlightText' },
-		--       tags = { hl_group = 'ObsidianTag' },
-		--       block_ids = { hl_group = 'ObsidianBlockID' },
-		--       hl_groups = {
-		--         -- The options are passed directly to `vim.api.nvim_set_hl()`. See `:help nvim_set_hl`.
-		--         ObsidianTodo = { bold = true, fg = '#f78c6c' },
-		--         ObsidianDone = { bold = true, fg = '#89ddff' },
-		--         ObsidianRightArrow = { bold = true, fg = '#f78c6c' },
-		--         ObsidianTilde = { bold = true, fg = '#ff5370' },
-		--         ObsidianImportant = { bold = true, fg = '#d73128' },
-		--         ObsidianBullet = { bold = true, fg = '#89ddff' },
-		--         ObsidianRefText = { underline = true, fg = '#c792ea' },
-		--         ObsidianExtLinkIcon = { fg = '#c792ea' },
-		--         ObsidianTag = { italic = true, fg = '#89ddff' },
-		--         ObsidianBlockID = { italic = true, fg = '#89ddff' },
-		--         ObsidianHighlightText = { bg = '#75662e' },
-		--       },
-		--     },
-		--
-		--     picker = {
-		--       -- Set your preferred picker. Can be one of 'telescope.nvim', 'fzf-lua', or 'mini.pick'.
-		--       name = 'telescope.nvim',
-		--       -- Optional, configure key mappings for the picker. These are the defaults.
-		--       -- Not all pickers support all mappings.
-		--       note_mappings = {
-		--         -- Create a new note from your query.
-		--         new = '<C-x>',
-		--         -- Insert a link to the selected note.
-		--         insert_link = '<C-l>',
-		--       },
-		--       tag_mappings = {
-		--         -- Add tag(s) to current note.
-		--         tag_note = '<C-x>',
-		--         -- Insert a tag at the current location.
-		--         insert_tag = '<C-l>',
-		--       },
-		--     },
-		--     mappings = {},
-		--     completion = {
-		--       nvim_cmp = false,
-		--     },
-		--     templates = {
-		--       folder = 'templates',
-		--       date_format = '%Y-%m-%d',
-		--     },
-		--   },
-		-- },
 
 		{
 			'nvim-telescope/telescope-file-browser.nvim',
