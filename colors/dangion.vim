@@ -68,6 +68,9 @@ highlight Number         guifg=#6f7b68
 highlight Boolean         guifg=#6f7b68
 highlight WinSeparator         guibg=#111111 guifg=#888888
 
+" Git blame
+highlight GitSignsCurrentLineBlame guifg=#7a7a7a gui=italic
+
 " markdown
 highlight RenderMarkdownCode guibg=#202020 guifg=#FEFEFE
 highlight RenderMarkdownInlineHighlight guifg=#202020 guibg=#A2A970

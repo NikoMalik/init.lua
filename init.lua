@@ -18,6 +18,8 @@ vim.g.mapleader = ' '
 vim.keymap.set('n', '<leader>ll', vim.lsp.buf.code_action)
 
 
+
+
 -- vim.api.nvim_create_autocmd('FileType', {
 -- 	pattern = { 'c', 'cpp' },
 -- 	callback = function()
@@ -214,6 +216,44 @@ vim.cmd.colorscheme 'dangion'
 --     vim.o.number = true
 --   end,
 -- })
+--
+--
+
+
+
+local ra_settings = {
+	rust_analyzer = {
+		cmd = { 'rust-analyzer' },
+		filetypes = { 'rust' },
+		root_markers = { 'Cargo.toml', 'rust-project.json' },
+		diagnostics = { disabled = { 'inactive-code' } },
+		settings = {
+			['rust-analyzer'] = {
+				rust = {
+					sysroot = 'none',
+				},
+				cargo = {
+					loadOutDirsFromCheck = true,
+				},
+			},
+			checkOnSave = {
+				allFeatures = false,
+				command = 'clippy',
+				extraArgs = { '--no-deps' },
+			},
+			procMacro = {
+				enable = true,
+				ignored = {
+					['async-trait'] = { 'async_trait' },
+					['napi-derive'] = { 'napi' },
+					['async-recursion'] = { 'async_recursion' },
+				},
+			},
+		},
+	},
+
+
+}
 
 local function interactive_replace()
 	local mode = vim.fn.mode(1)
@@ -346,8 +386,9 @@ vim.o.inccommand = 'split'
 vim.o.cursorline = false
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.o.scrolloff = 10
-vim.o.tabstop = 4
+vim.o.scrolloff = 1
+vim.o.sidescrolloff = 5
+vim.o.tabstop = 2
 vim.o.ttyfast = true
 vim.o.softtabstop = 4
 vim.o.shiftwidth = 4
@@ -380,6 +421,29 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 		vim.hl.on_yank()
 	end,
 })
+
+
+
+
+
+vim.keymap.set('n', '<space>t', function()
+	vim.cmd('tabnew')
+	vim.fn.termopen('/usr/bin/fish', {
+		cwd = vim.fn.getcwd(),
+	})
+	vim.cmd.startinsert()
+end)
+
+
+
+vim.api.nvim_create_autocmd({ 'TermOpen', 'BufEnter' }, {
+	callback = function()
+		if vim.opt.buftype:get() == 'terminal' then
+			vim.cmd.startinsert()
+		end
+	end,
+})
+vim.keymap.set('t', '<C-x>', "<C-\\><C-N>", { noremap = true, silent = true }) -- escape terminal
 
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -1089,9 +1153,11 @@ require('lazy').setup({
 					},
 					clangd = {
 						cmd = {
-							'clangd',
-							'--background-index',
-							'--header-insertion=never',
+							"clangd",
+							"-j=16",
+							"--background-index",
+							"--clang-tidy",
+							"--header-insertion=iwyu",
 						},
 						filetypes = { 'c', 'cpp' },
 						root_markers = {
@@ -1132,6 +1198,7 @@ require('lazy').setup({
 						cmd = { 'rust-analyzer' },
 						filetypes = { 'rust' },
 						root_markers = { 'Cargo.toml', 'rust-project.json' },
+						diagnostics = { disabled = { 'inactive-code' } },
 						settings = {
 							['rust-analyzer'] = {
 								rust = {
@@ -1356,6 +1423,13 @@ require('lazy').setup({
 				signature = { enabled = true },
 			},
 		},
+		{
+			'saecki/crates.nvim',
+			tag = 'stable',
+			config = function()
+				require('crates').setup()
+			end,
+		},
 
 		-- Highlight todo, notes, etc in comments
 		{ 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
@@ -1490,6 +1564,12 @@ require('lazy').setup({
 
 			--  Check out: https://github.com/echasnovski/mini.nvim
 		},
+
+		{
+			'mrcjkb/rustaceanvim',
+			version = '^8', -- Recommended
+			lazy = false,
+		},
 		{ -- Highlight, edit, and navigate code
 			'nvim-treesitter/nvim-treesitter',
 			lazy = false,
@@ -1558,3 +1638,13 @@ require('lazy').setup({
 			},
 		},
 	})
+
+
+
+
+
+vim.g.rustaceanvim = {
+	server = {
+		default_settings = ra_settings,
+	},
+}
