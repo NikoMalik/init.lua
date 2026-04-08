@@ -17,8 +17,29 @@ local orig_notify = vim.notify
 vim.g.mapleader = ' '
 vim.keymap.set('n', '<leader>ll', vim.lsp.buf.code_action)
 
-
-
+require("vim._core.ui2").enable {
+	enable = true,
+	msg = { -- Options related to the message module.
+		---@type 'cmd'|'msg' Default message target, either in the
+		---cmdline or in a separate ephemeral message window.
+		---@type string|table<string, 'cmd'|'msg'|'pager'> Default message target
+		---or table mapping |ui-messages| kinds and triggers to a target.
+		targets = "cmd",
+		cmd = {    -- Options related to messages in the cmdline window.
+			height = 0.5, -- Maximum height while expanded for messages beyond 'cmdheight'.
+		},
+		dialog = { -- Options related to dialog window.
+			height = 0.5, -- Maximum height.
+		},
+		msg = {    -- Options related to msg window.
+			height = 0.5, -- Maximum height.
+			timeout = 4000, -- Time a message is visible in the message window.
+		},
+		pager = {  -- Options related to message window.
+			height = 0.5, -- Maximum height.
+		},
+	},
+}
 
 -- vim.api.nvim_create_autocmd('FileType', {
 -- 	pattern = { 'c', 'cpp' },
@@ -208,7 +229,7 @@ vim.keymap.set('n', '<leader>jn', ':JournalToday<CR>', { desc = 'Open today’s 
 vim.keymap.set('n', '\\', '<cmd>:vsplit <CR>', { desc = 'Vertical Split' })
 vim.keymap.set('n', '|', ':split<CR>', { desc = 'Horizontal Split' })
 -- vim.cmd.colorscheme 'dosbox' -- super great but a litle bit smoke
---vim.cmd.colorscheme 'dangion'
+vim.cmd.colorscheme 'dangion'
 -- vim.cmd('colorscheme jb')
 
 -- vim.api.nvim_create_autocmd({ 'InsertEnter', 'InsertLeave' }, {
@@ -360,10 +381,10 @@ vim.o.smartcase = true
 vim.o.signcolumn = 'yes'
 
 -- Decrease update time
-vim.o.updatetime = 50
+vim.o.updatetime = 250
 
 -- Decrease mapped sequence wait time
-vim.o.timeoutlen = 300
+vim.o.timeoutlen = 200
 
 -- Configure how new splits should be opened
 vim.o.splitright = true
@@ -832,7 +853,7 @@ require('lazy').setup({
 				topdelete = { text = '‾' },
 				changedelete = { text = '~' },
 			},
-			current_line_blame = true,
+			current_line_blame = false,
 			current_line_blame_opts = {
 				virt_text = true,
 				virt_text_pos = 'eol',
@@ -866,17 +887,31 @@ require('lazy').setup({
 	-- 	end,
 	-- },
 	--
-
+	{
+		"zenbones-theme/zenbones.nvim",
+		-- Optionally install Lush. Allows for more configuration or extending the colorscheme
+		-- If you don't want to install lush, make sure to set g:zenbones_compat = 1
+		-- In Vim, compat mode is turned on as Lush only works in Neovim.
+		dependencies = "rktjmp/lush.nvim",
+		lazy = true,
+		priority = 1000,
+		-- you can set set configuration options here
+		-- config = function()
+		--     vim.g.zenbones_darken_comments = 45
+		--     vim.cmd.colorscheme('zenbones')
+		-- end
+	},
+	{ "blazkowolf/gruber-darker.nvim" },
 	{
 		"nickkadutskyi/jb.nvim",
-		lazy = false,
+		lazy = true,
 		priority = 1000,
 		opts = {},
 		config = function()
 			-- require("jb").setup({transparent = true})
 			-- Set pointer and operator colors to blue (like in JetBrains IDEs)
 			-- Using the blue color from jb theme for operators and pointers
-			vim.cmd("colorscheme jb")
+			-- vim.cmd("colorscheme jb")
 			-- local blue = "#5394EC" -- JetBrains blue for operators
 			--
 			-- vim.api.nvim_set_hl(0, '@operator', { fg = blue })
@@ -1459,7 +1494,7 @@ require('lazy').setup({
 	},
 
 	-- Highlight todo, notes, etc in comments
-	{ 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
+	{ 'folke/todo-comments.nvim',     event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
 	{ -- Collection of various small independent plugins/modules
 		'echasnovski/mini.nvim',
