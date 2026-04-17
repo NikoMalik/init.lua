@@ -347,15 +347,24 @@ vim.g.have_nerd_font = false
 -- NOTE: You can change these options as you wish!
 --  For more options, you can see `:help option-list`
 
+
+
+
+
+
+
+
 -- Make line numbers default
-vim.o.number = true
-vim.o.relativenumber = false
+vim.o.number = false
+vim.o.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
 vim.o.wrap = true
 vim.o.showbreak = '↪ '
 vim.o.termguicolors = true
+
+vim.o.numberwidth = 2
 
 -- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
@@ -381,7 +390,7 @@ vim.o.smartcase = true
 vim.o.signcolumn = 'yes'
 
 -- Decrease update time
-vim.o.updatetime = 250
+vim.o.updatetime = 50
 
 -- Decrease mapped sequence wait time
 vim.o.timeoutlen = 200
@@ -1713,6 +1722,7 @@ require('lazy').setup({
 					-- for more info on folds see `:help folds`
 					-- vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 					-- vim.wo.foldmethod = 'expr'
+					vim.o.foldenable = false
 
 					-- enables treesitter based indentation
 					vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
