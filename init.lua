@@ -338,7 +338,6 @@ vim.keymap.set('n', '<leader>[', function()
 	vim.diagnostic.open_float(nil, { focusable = false })
 end, { desc = 'LSP diagnostics float' })
 
--- vim.o.number = true
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
 
@@ -355,8 +354,8 @@ vim.g.have_nerd_font = false
 
 
 -- Make line numbers default
-vim.o.number = false
-vim.o.relativenumber = true
+vim.o.number = true
+vim.o.relativenumber = false
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
@@ -431,7 +430,8 @@ vim.o.breakindent = true
 vim.o.hlsearch = false
 vim.o.incsearch = true
 vim.o.confirm = false
-vim.o.jumpoptions = 'stack'
+vim.opt.jumpoptions = "stack,view"
+
 vim.o.autoread = true
 vim.o.swapfile = false
 vim.o.showmode = false
@@ -598,7 +598,6 @@ require('lazy').setup({
 		},
 	},
 
-	-- <leader>vv - enable/disable. in venn:
 	-- - HJKL - draw lines (─ │ ┌ ┐ └ ┘)
 	-- - visual select + f — draw in box (┌──┐ │ │ └──┘)
 	'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
@@ -911,6 +910,12 @@ require('lazy').setup({
 		-- end
 	},
 	{ "blazkowolf/gruber-darker.nvim" },
+
+	{
+		"NikoMalik/dookie.nvim",
+		config = function()
+		end,
+	},
 	{
 		"nickkadutskyi/jb.nvim",
 		lazy = true,
