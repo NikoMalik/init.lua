@@ -244,37 +244,27 @@ vim.cmd.colorscheme 'dangion'
 
 
 local ra_settings = {
-	rust_analyzer = {
-		cmd = { 'rust-analyzer' },
-		filetypes = { 'rust' },
-		root_markers = { 'Cargo.toml', 'rust-project.json' },
-		diagnostics = { disabled = { 'inactive-code' } },
-		settings = {
-			['rust-analyzer'] = {
-				rust = {
-					sysroot = 'none',
-				},
-				cargo = {
-					loadOutDirsFromCheck = true,
-				},
-			},
-			checkOnSave = {
-				allFeatures = false,
-				command = 'clippy',
-				extraArgs = { '--no-deps' },
-			},
-			procMacro = {
-				enable = true,
-				ignored = {
-					['async-trait'] = { 'async_trait' },
-					['napi-derive'] = { 'napi' },
-					['async-recursion'] = { 'async_recursion' },
-				},
+	['rust-analyzer'] = {
+		rust = {
+			sysroot = 'none',
+		},
+		cargo = {
+			loadOutDirsFromCheck = true,
+		},
+		checkOnSave = {
+			allFeatures = false,
+			command = 'clippy',
+			extraArgs = { '--no-deps' },
+		},
+		procMacro = {
+			enable = true,
+			ignored = {
+				['async-trait'] = { 'async_trait' },
+				['napi-derive'] = { 'napi' },
+				['async-recursion'] = { 'async_recursion' },
 			},
 		},
 	},
-
-
 }
 
 local function interactive_replace()
@@ -1266,35 +1256,6 @@ require('lazy').setup({
 								functionTypeParameters = true,
 								parameterNames = true,
 								rangeVariableTypes = true,
-							},
-						},
-					},
-				},
-				rust_analyzer = {
-					cmd = { 'rust-analyzer' },
-					filetypes = { 'rust' },
-					root_markers = { 'Cargo.toml', 'rust-project.json' },
-					diagnostics = { disabled = { 'inactive-code' } },
-					settings = {
-						['rust-analyzer'] = {
-							rust = {
-								sysroot = 'none',
-							},
-							cargo = {
-								loadOutDirsFromCheck = true,
-							},
-						},
-						checkOnSave = {
-							allFeatures = false,
-							command = 'clippy',
-							extraArgs = { '--no-deps' },
-						},
-						procMacro = {
-							enable = true,
-							ignored = {
-								['async-trait'] = { 'async_trait' },
-								['napi-derive'] = { 'napi' },
-								['async-recursion'] = { 'async_recursion' },
 							},
 						},
 					},
