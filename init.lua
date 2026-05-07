@@ -1462,6 +1462,7 @@ require('lazy').setup({
 	},
 	{
 		'saecki/crates.nvim',
+		dependencies = { 'nvim-lua/plenary.nvim' },
 		tag = 'stable',
 		config = function()
 			require('crates').setup()
