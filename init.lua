@@ -16,6 +16,7 @@ vim.g.loaded_ruby_provider = 0
 local orig_notify = vim.notify
 vim.g.mapleader = ' '
 vim.keymap.set('n', '<leader>ll', vim.lsp.buf.code_action)
+vim.opt.scrollback = 100000
 
 require("vim._core.ui2").enable {
 	enable = true,
@@ -181,8 +182,8 @@ vim.api.nvim_create_autocmd('VimResized', {
 
 vim.keymap.set('n', '<C-j>', ':m .+1<CR>==')
 vim.keymap.set('n', '<C-k>', ':m .-2<CR>==')
-vim.keymap.set('v', '<C-j>', ":m '>+1<CR>gv=gv")
-vim.keymap.set('v', '<C-k>', ":m '<-2<CR>gv=gv")
+vim.keymap.set('v', '<D-k>', ":m '<-2<CR>gv=gv")
+vim.keymap.set('v', '<D-j>', ":m '>+1<CR>gv=gv")
 vim.keymap.set('i', 'jk', '<Esc>')
 vim.keymap.set('n', '<C-a>', 'ggvG')
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
@@ -366,6 +367,21 @@ vim.schedule(function()
 	vim.o.clipboard = 'unnamedplus'
 end)
 
+if os.getenv("SSH_TTY") then
+	vim.g.clipboard = {
+		name = "OSC 52",
+		copy = {
+			["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+			["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+		},
+		paste = {
+			["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+			["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+		},
+	}
+end
+
+
 -- Save undo history
 vim.o.undofile = true
 vim.o.smoothscroll = true
@@ -410,7 +426,7 @@ vim.o.scrolloff = 1
 vim.o.sidescrolloff = 5
 vim.o.tabstop = 2
 vim.o.ttyfast = true
-vim.o.softtabstop = 4
+vim.o.softtabstop = 0
 vim.o.shiftwidth = 4
 vim.o.lazyredraw = true
 vim.o.expandtab = false
@@ -447,23 +463,9 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 
 
-vim.keymap.set('n', '<space>t', function()
-	vim.cmd('tabnew')
-	vim.fn.termopen('/usr/bin/fish', {
-		cwd = vim.fn.getcwd(),
-	})
-	vim.cmd.startinsert()
-end)
 
 
 
-vim.api.nvim_create_autocmd({ 'TermOpen', 'BufEnter' }, {
-	callback = function()
-		if vim.opt.buftype:get() == 'terminal' then
-			vim.cmd.startinsert()
-		end
-	end,
-})
 vim.keymap.set('t', '<C-x>', "<C-\\><C-N>", { noremap = true, silent = true }) -- escape terminal
 
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
