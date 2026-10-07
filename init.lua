@@ -130,6 +130,7 @@ vim.g.maplocalleader = ' '
 vim.o.winborder = 'rounded'
 -- vim.g.syntax = 'off'
 vim.o.encoding = 'utf-8'
+vim.o.exrc = true
 -- vim.o.autocomplete = true
 
 -- -- auto close
@@ -370,6 +371,34 @@ vim.o.list = false
 vim.schedule(function()
 	vim.o.clipboard = 'unnamedplus'
 end)
+
+if vim.fn.has("wsl") == 1 then
+	-- copy goes to the system clipboard via OSC 52; paste returns the last yank from nvim,
+	-- since Windows Terminal does not answer OSC 52 paste queries (use Ctrl+Shift+V for external text)
+	local osc52 = require("vim.ui.clipboard.osc52")
+	local cache = { {}, "v" }
+	local function copy(reg)
+		local send = osc52.copy(reg)
+		return function(lines, regtype)
+			cache = { lines, regtype }
+			send(lines, regtype)
+		end
+	end
+	local function paste() return cache end
+	vim.g.clipboard = {
+		name = "OSC 52",
+		copy = {
+			["+"] = copy("+"),
+			["*"] = copy("*"),
+		},
+		paste = {
+			["+"] = paste,
+			["*"] = paste,
+		},
+	}
+end
+
+
 
 if os.getenv("SSH_TTY") then
 	vim.g.clipboard = {
@@ -1406,6 +1435,11 @@ require('lazy').setup({
 						'configure.ac',
 						'.git',
 					},
+				},
+				postgrestools = {
+					cmd = { 'postgrestools', 'lsp-proxy' },
+					filetypes = { 'sql' },
+					root_markers = { 'postgrestools.jsonc', '.git' },
 				},
 				gopls = {
 					cmd = { 'gopls' },
