@@ -12,6 +12,7 @@
   "gruber-darker.nvim": { "branch": "main", "commit": "50fa4e583099729fcaaadc73a5afb74f7a91a625" },
   "grug-far.nvim": { "branch": "main", "commit": "11595bf747edc270bce2069d1020502ad4ae56cf" },
   "guess-indent.nvim": { "branch": "main", "commit": "84a4987ff36798c2fc1169cbaff67960aed9776f" },
+  "harpoon": { "branch": "harpoon2", "commit": "87b1a3506211538f460786c23f98ec63ad9af4e5" },
   "img-clip.nvim": { "branch": "main", "commit": "99848daf801789dbebe2192b475eb887d375002c" },
   "iwe.nvim": { "branch": "main", "commit": "dae7667a41cdd9fca9cb232e97aa8e436c592013" },
   "jb.nvim": { "branch": "main", "commit": "449f6e51c555b5b9517ef5d80328e48de2a0c69a" },

@@ -189,6 +189,8 @@ vim.keymap.set('n', '<C-j>', ':m .+1<CR>==')
 vim.keymap.set('n', '<C-k>', ':m .-2<CR>==')
 vim.keymap.set('v', '<D-k>', ":m '<-2<CR>gv=gv")
 vim.keymap.set('v', '<D-j>', ":m '>+1<CR>gv=gv")
+vim.keymap.set('v', '>', '>gv')
+vim.keymap.set('v', '<', '<gv')
 vim.keymap.set('i', 'jk', '<Esc>')
 vim.keymap.set('n', '<C-a>', 'ggvG')
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
@@ -200,8 +202,6 @@ vim.keymap.set('n', '<C-j>', '<C-w>j')
 vim.keymap.set('n', '<C-k>', '<C-w>k')
 vim.keymap.set('n', ';', ':')
 vim.keymap.set('n', '<CR>', ':nohlsearch<CR><CR>')
-vim.keymap.set('n', '<leader>h',
-	':silent! !tmux popup -d "#{pane_current_path}" -xC -yC -w80\\% -h80\\% -E >/dev/null 2>&1<CR>')
 vim.keymap.set('n', '<leader>v', ':silent! !tmux split-window -v -p 20 >/dev/null 2>&1<CR>')
 
 -- vim.keymap.set('n', '<leader>v', function()
@@ -645,7 +645,7 @@ require('lazy').setup({
 				},
 			},
 			view = {
-				width = 30,
+				width = { min = 30, max = 60, padding = 1 },
 				side = 'left',
 			},
 			renderer = {
@@ -668,6 +668,23 @@ require('lazy').setup({
 				},
 			},
 		},
+	},
+	{
+		'ThePrimeagen/harpoon',
+		branch = 'harpoon2',
+		dependencies = { 'nvim-lua/plenary.nvim' },
+		config = function()
+			local harpoon = require('harpoon')
+			harpoon:setup()
+
+			vim.keymap.set('n', '<leader>a', function() harpoon:list():add() end, { desc = 'Harpoon add file' })
+			vim.keymap.set('n', '<C-e>', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = 'Harpoon menu' })
+
+			vim.keymap.set('n', '<leader>h', function() harpoon:list():select(1) end, { desc = 'Harpoon slot 1' })
+			vim.keymap.set('n', '<leader>j', function() harpoon:list():select(2) end, { desc = 'Harpoon slot 2' })
+			vim.keymap.set('n', '<leader>k', function() harpoon:list():select(3) end, { desc = 'Harpoon slot 3' })
+			vim.keymap.set('n', '<leader>l', function() harpoon:list():select(4) end, { desc = 'Harpoon slot 4' })
+		end,
 	},
 	{
 		'yousefhadder/markdown-plus.nvim', -- https://github.com/yousefhadder/markdown-plus.nvim/wiki/5.Keymaps
