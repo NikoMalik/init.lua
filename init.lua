@@ -254,6 +254,9 @@ local ra_settings = {
 		rust = {
 			sysroot = 'none',
 		},
+		files = {
+			watcher = "client", -- Use Neovim's file watching mechanism
+		},
 		cargo = {
 			loadOutDirsFromCheck = true,
 		},
@@ -678,7 +681,8 @@ require('lazy').setup({
 			harpoon:setup()
 
 			vim.keymap.set('n', '<leader>a', function() harpoon:list():add() end, { desc = 'Harpoon add file' })
-			vim.keymap.set('n', '<C-e>', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = 'Harpoon menu' })
+			vim.keymap.set('n', '<C-e>', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end,
+				{ desc = 'Harpoon menu' })
 
 			vim.keymap.set('n', '<leader>h', function() harpoon:list():select(1) end, { desc = 'Harpoon slot 1' })
 			vim.keymap.set('n', '<leader>j', function() harpoon:list():select(2) end, { desc = 'Harpoon slot 2' })
