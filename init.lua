@@ -358,7 +358,10 @@ vim.o.relativenumber = false
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
+-- vim.o.wrap = false
 vim.o.wrap = true
+vim.o.linebreak = true
+vim.o.breakindentopt = 'shift:2'
 vim.o.showbreak = '↪ '
 vim.o.termguicolors = true
 
