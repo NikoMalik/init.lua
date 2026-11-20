@@ -57,6 +57,43 @@ require("vim._core.ui2").enable {
 -- 		vim.opt_local.colorcolumn = { 100 }
 -- 	end,
 -- })
+local ns = vim.api.nvim_create_namespace("verus_dim")
+vim.api.nvim_set_hl(0, "VerusDim", { link = "Comment", default = true })
+
+local query = vim.treesitter.query.parse("rust", [[
+  ((attribute_item) @verus (#lua-match? @verus "verus_keep_ghost"))
+  ((inner_attribute_item) @verus (#lua-match? @verus "verus_keep_ghost"))
+  ((macro_invocation macro: (identifier) @name) @verus (#any-of? @name "proof_decl" "proof"))
+  ((line_comment) @verus (#lua-match? @verus "^//=+verus=+//$"))
+  ((line_comment) @verus (#lua-match? @verus "^//=+//$"))
+]])
+
+local function dim(buf)
+	vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
+	local ok, parser = pcall(vim.treesitter.get_parser, buf, "rust")
+	if not ok or not parser then
+		return
+	end
+	local root = parser:parse()[1]:root()
+	for id, node in query:iter_captures(root, buf, 0, -1) do
+		if query.captures[id] == "verus" then
+			local sr, sc, er, ec = node:range()
+			vim.api.nvim_buf_set_extmark(buf, ns, sr, sc, {
+				end_row = er,
+				end_col = ec,
+				hl_group = "VerusDim",
+				priority = 250,
+			})
+		end
+	end
+end
+
+vim.api.nvim_create_autocmd({ "BufEnter", "TextChanged", "InsertLeave" }, {
+	pattern = "*.rs",
+	callback = function(ev)
+		dim(ev.buf)
+	end,
+})
 
 vim.api.nvim_create_autocmd('FileType', {
 	pattern = { 'text', 'markdown', 'tex', 'typst' },
@@ -434,7 +471,7 @@ vim.o.smartcase = true
 vim.o.signcolumn = 'yes'
 
 -- Decrease update time
-vim.o.updatetime = 50
+vim.o.updatetime = 100
 
 -- Decrease mapped sequence wait time
 vim.o.timeoutlen = 200
@@ -774,6 +811,7 @@ require('lazy').setup({
 			require('bufferline').setup {
 				options = {
 					mode = 'buffers',
+					style_preset = require('bufferline').style_preset.minimal,
 					themable = true,
 
 					numbers = 'none',
@@ -784,8 +822,7 @@ require('lazy').setup({
 					left_mouse_command = 'buffer %d',
 
 					indicator = {
-						icon = '▎',
-						style = 'icon',
+						style = 'none',
 					},
 
 					buffer_close_icon = '󰅖',
@@ -797,7 +834,7 @@ require('lazy').setup({
 					max_name_length = 18,
 					max_prefix_length = 15,
 					truncate_names = true,
-					tab_size = 18,
+					tab_size = 0,
 
 					diagnostics = 'nvim_lsp',
 					diagnostics_update_on_event = true,
@@ -817,16 +854,16 @@ require('lazy').setup({
 
 					color_icons = true,
 					show_buffer_icons = true,
-					show_buffer_close_icons = true,
-					show_close_icon = true,
+					show_buffer_close_icons = false,
+					show_close_icon = false,
 					show_tab_indicators = true,
 
 					persist_buffer_sort = true,
 					move_wraps_at_ends = false,
 
-					separator_style = 'slant',
+					separator_style = { '', '' },
 
-					always_show_bufferline = true,
+					always_show_bufferline = false,
 					auto_toggle_bufferline = true,
 
 					hover = {
@@ -1437,8 +1474,11 @@ require('lazy').setup({
 				nix = {
 					cmd = { 'nixd' },
 					filetypes = { 'nix' },
-					formatting = {
-						command = { 'nixfmt' },
+					settings = {
+						nixd = {
+							nixpkgs = { expr = 'import (builtins.getFlake (toString ./.)).inputs.nixpkgs { }' },
+							formatting = { command = { 'nixfmt' } },
+						},
 					},
 				},
 				clangd = {
