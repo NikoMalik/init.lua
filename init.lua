@@ -395,8 +395,7 @@ vim.o.relativenumber = false
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
--- vim.o.wrap = false
-vim.o.wrap = true
+vim.o.wrap = false
 vim.o.linebreak = true
 vim.o.breakindentopt = 'shift:2'
 vim.o.showbreak = '↪ '
@@ -688,7 +687,7 @@ require('lazy').setup({
 				},
 			},
 			view = {
-				width = { min = 30, max = 60, padding = 1 },
+				width = 30,
 				side = 'left',
 			},
 			renderer = {
@@ -1805,6 +1804,14 @@ require('lazy').setup({
 			--  - yinq - [Y]ank [I]nside [N]ext [Q]uote
 			--  - ci'  - [C]hange [I]nside [']quote
 			--  vi' - Select around
+			require('mini.files').setup { windows = { preview = true, width_focus = 30, width_preview = 50 } }
+			vim.keymap.set('n', '-', function()
+				if not require('mini.files').close() then
+					local path = vim.api.nvim_buf_get_name(0)
+					require('mini.files').open(vim.uv.fs_stat(path) and path or nil)
+				end
+			end, { desc = 'Float file explorer' })
+
 			require('mini.ai').setup { n_lines = 500 }
 
 			-- Add/delete/replace surroundings (brackets, quotes, etc.)
